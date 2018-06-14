@@ -106,3 +106,6 @@ pip-selfcheck.json
 
 # SSM to exclude "data" directory that will hold templates
 data
+
+# ssm - ignore and vrops pak files
+*pak

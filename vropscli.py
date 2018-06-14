@@ -78,7 +78,7 @@ class vropscli:
 
     def getSolution(self):
         '''
-        Get available license
+        Get all solutions installed
         '''
         url = 'https://' + self.config['host'] + '/suite-api/api/solutions'
         r = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
@@ -86,7 +86,7 @@ class vropscli:
 
     def getVropsLicense(self):
         '''
-        Get available license
+        Get installed VROps license
         '''
         url = 'https://' + self.config['host'] + '/suite-api/api/deployment/licenses'
         r = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
@@ -118,7 +118,84 @@ class vropscli:
             print(str(r.status_code))
             return False
 
-    
+    def uploadPak(self, pakFile, overwritePak=False):
+        '''
+        Upload a Pak file to the server
+        '''
+        if overwritePak == True:
+            pak_handling_advice = 'STANDARD'
+        else:
+            pak_handling_advice = 'CLOBBER'
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/operation/upload'
+        files = { 'contents': open(pakFile, 'rb') }
+        data = { 'pak_handling_advice': pak_handling_advice }
+        print("Startup Pak Upload.  This may take a while")
+        r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        if r.status_code < 300:
+            print('Upload Successful!')
+            return json.loads(r.text)
+        else:
+            print('Failed to Upload Pak')
+            print(str(r.status_code))
+            print(r.text)
+
+    def getPakInfo(self, pakID):
+        '''
+        Get Uploaded Pak Info
+        '''
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakID + '/information'
+        r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        if r.status_code < 300:
+            return json.loads(r.text)
+            return True
+        else:
+            print('Failed to Get Pak Info')
+            print(str(r.status_code))
+
+    def installPak(self, pakId, force_content_update=True):
+        '''
+        Install an uploaded Pak File
+        '''
+        if force_content_update == True:
+            content_text = 'true'
+        else:
+            content_text = 'false'
+        #data = { 'force_content_update': content_text }
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install'
+        #r = requests.post(url, headers=clilib.get_headers(), data=data, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        r = requests.post(url, headers=clilib.get_headers(), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        if r.status_code < 300:
+            print('Pak installation started.  Run "vropscli.py getCurrentActivity" to get current status')
+            return True
+        else:
+            print('Failed to Install Pak')
+            print('Return code: ' + str(r.status_code))
+            print(r.text)
+
+    def getPakStatus(self, pakID):
+        '''
+        Get Pak Installation during Upgrade
+        '''
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakID + '/status'
+        r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        if r.status_code < 300:
+            return json.loads(r.text)
+            return True
+        else:
+            print('Failed to Get Pak Info')
+
+    def getCurrentActivity(self):
+        '''
+        Get current activity of vROps
+        '''
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/current_activity'
+        r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        if r.status_code < 300:
+            return json.loads(r.text)
+            return True
+        else:
+            print('Failed to Get Pak Info')
+
 
     def __init__(self):
         requests.packages.urllib3.disable_warnings()
