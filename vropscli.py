@@ -21,6 +21,20 @@ class vropscli:
         response_parsed = json.loads(response.text)
         return response_parsed
 
+    def getAdapter(self, adapterID):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterID
+
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        return response_parsed
+
+    def getAdapters(self):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters"
+
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        return response_parsed
+
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds" 
         headers = {
@@ -33,6 +47,31 @@ class vropscli:
         for adapter in response_parsed["adapter-kind"]:
           adapterkindacc.append(adapter["key"])
         return adapterkindacc
+
+    def getAdapterKindConfigParams(self, adapterKind):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterKind + '/resourcekinds/'
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        key = ""
+        for resource in response_parsed["resource-kind"]:
+            if "ADAPTER_INSTANCE" in resource["resourceKindType"]:
+                key=resource["key"]
+        if key == "":
+            print("No key found for " + adapterKind)
+        rsurl = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterKind + '/resourcekinds/' + key 
+        rsresponse = requests.request("GET", rsurl, headers=clilib.get_token_header(self.token['token']), verify=False)
+        return(json.loads(rsresponse.text)['resourceIdentifierTypes'])
+        #for resource_kinds in rs_parsed['resource-kind']:
+        #    print
+
+    def getAdapterConfig(self, adapterId):
+        adapterinfo = self.getAdapter(adapterId)
+        settingsinfo = {}
+        for setting in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+            settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
+        return settingsinfo
+        #return(adapterinfo["resourceKey"]["resourceIdentifiers"]) 
+        
 
     def getResourcesOfAdapterKind(self, adapterkey):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterkey + '/resources'
