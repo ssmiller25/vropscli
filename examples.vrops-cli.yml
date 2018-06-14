@@ -1,4 +1,4 @@
-main:
+config:
     host: "sourcevrops.domain"
     user: "admin"
     pass: "password"
