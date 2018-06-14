@@ -1,0 +1,4 @@
+main:
+    host: "sourcevrops.domain"
+    user: "admin"
+    pass: "password"
