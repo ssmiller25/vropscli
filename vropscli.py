@@ -235,18 +235,28 @@ class vropscli:
         else:
             print('Failed to Get Pak Info')
 
+    def getAdapterCollectionStatus(self, adapterID):
+        #set the url for the adapter instance
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/resources'
+        #grab all the resources for the adapter instance
+        resources = requests.get(url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        #filter down to the collection status
+        #Currently grabs everything within the resourceStatusStates and needs to be filtered down to just resourceStatus
+        collectionStatus = (json.loads(resources.text)["resourceList"][0]["resourceStatusStates"])
+        return collectionStatus
+
     def stopAdapterInstance(self, adapterID):
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/stop'
         #A put request to turn off the adapter
-        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         print("This might have done something, but you aren't too certain")
 
     def startAdapterInstance(self, adapterID):
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/start'
         #A put request to turn on the adapter
-        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         print("This should turn things on...right?")
 
     def __init__(self):
