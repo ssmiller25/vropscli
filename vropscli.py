@@ -235,6 +235,19 @@ class vropscli:
         else:
             print('Failed to Get Pak Info')
 
+    def stopAdapterInstance(self, adapterID):
+        #set the url for the adapter instance
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/stop'
+        #A put request to turn off the adapter
+        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        print("This might have done something, but you aren't too certain")
+
+    def startAdapterInstance(self, adapterID):
+        #set the url for the adapter instance
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/start'
+        #A put request to turn on the adapter
+        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        print("This should turn things on...right?")
 
     def __init__(self):
         requests.packages.urllib3.disable_warnings()
