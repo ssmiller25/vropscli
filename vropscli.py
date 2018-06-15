@@ -5,6 +5,7 @@ import json
 import pprint
 import dateparser
 import fire
+import ast
 
 
 class vropscli:
@@ -68,9 +69,50 @@ class vropscli:
         adapterinfo = self.getAdapter(adapterId)
         settingsinfo = {}
         for setting in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+            #settingsinfo.append({"name": setting["identifierType"]["name"], "value": setting["value"]})
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
-        return settingsinfo
-        #return(adapterinfo["resourceKey"]["resourceIdentifiers"]) 
+        #pprint.pprint(settingsinfo)
+        return(adapterinfo["resourceKey"]["resourceIdentifiers"]) 
+
+    def createAdapterInstance(self, name, adapterKind, resourceParams, credentialId, description="", collectorId=1):
+        resourceConfigPassed = {}
+        print(resourceParams)
+        try:
+            resourceConfigPassed = ast.literal_eval(resourceParams)
+        except:
+            print("Warning: Malformed string resourceParams")
+            return False
+
+        resourceConfig = []
+        for resourcekey, resourcevalue in resourceConfigPassed.items():
+            resourceConfig.append({'name': resourcekey, 'value': resourcevalue})
+            
+
+        newadapterdata= {
+            "name": name,
+            "description": description,
+            "collectorId": collectorId,
+            "adapterKindKey": adapterKind,
+            "resourceIdentifiers": resourceConfig,
+            "credentials": {
+                "id": credentialId
+            }
+        }
+
+        return newadapterdata
+
+        #url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+        #r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+        #if r.status_code < 300:
+        #    print('New Adapter Installed')
+        #    return True
+        #else:
+        #    print('Failed to install license for ' + solutionId)
+        #    print(str(r.status_code))
+        #    print(r.text)
+        #    return False
+
+        
         
 
     def getResourcesOfAdapterKind(self, adapterkey):
@@ -105,7 +147,16 @@ class vropscli:
             print(str(r.status_code))
             return False
 
+    def getCredentials(self):
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials"
 
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        credssum = {}
+        response_parsed = json.loads(response.text)
+        #return(response_parsed)
+        for credentialInstances in response_parsed['credentialInstances']:
+            credssum[credentialInstances["id"]]={'id': credentialInstances["id"], 'name': credentialInstances["name"], 'kind': credentialInstances["adapterKindKey"]}
+        return credssum
 
     def getSolutionLicense(self, solutionId):
         '''
