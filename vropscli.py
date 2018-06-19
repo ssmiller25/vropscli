@@ -312,7 +312,7 @@ class vropscli:
     def __init__(self):
         requests.packages.urllib3.disable_warnings()
         # Just Source Config
-        self.config=clilib.getConfig()["config"]
+        self.config=clilib.getConfig()["default"]
         self.token=clilib.getToken(self.config)
 
 #scalpel=tpscalpel()

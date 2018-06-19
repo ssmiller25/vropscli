@@ -17,7 +17,7 @@ def getConfig():
     Function returns a yaml object of the default config file
     File should live in '~/.config/vropstp.yml'
     '''
-    configfile="~/.config/vrops-cli.yml"
+    configfile="~/.config/vropscli.yml"
     try:
         with open(path.expanduser(configfile),"r") as c:
             config = load(c)
