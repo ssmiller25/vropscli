@@ -34,7 +34,9 @@ class vropscli:
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
-        return response_parsed
+        print("id,Name,Type")
+        for instance in response_parsed["adapterInstancesInfoDto"]:
+            print(instance["id"] + "," + instance["resourceKey"]["name"] + "," + instance["resourceKey"]["adapterKindKey"])
 
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds" 
@@ -72,7 +74,15 @@ class vropscli:
             #settingsinfo.append({"name": setting["identifierType"]["name"], "value": setting["value"]})
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
         #pprint.pprint(settingsinfo)
-        return(adapterinfo["resourceKey"]["resourceIdentifiers"]) 
+        csvheader = []
+        csvrow = []
+        csvheader.append("name")
+        csvrow.append(adapterinfo["resourceKey"]["name"])
+        for configparam in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+            csvheader.append(configparam["identifierType"]["name"])
+            csvrow.append(configparam["value"])
+        print(csvheader)
+        print(csvrow)
 
     def createAdapterInstance(self, name, adapterKind, resourceParams, credentialId, description="", collectorId=1):
         resourceConfigPassed = {}
