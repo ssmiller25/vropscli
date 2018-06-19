@@ -132,7 +132,7 @@ class vropscli:
         return json.loads(r.text)
 
 
-    def setVropsLicense(self, license_key='u442m-4421l-0818d-08900-1x51j'):
+    def setVropsLicense(self, license_key):
         '''
         vrops license key
         '''
@@ -148,7 +148,7 @@ class vropscli:
         }
 
         #TODO: Make use a token request
-        r = requests.post(url, data=dumps(data), headers=get_headers(), auth=requests.auth.HTTPBasicAuth(user, password), verify=False)
+        r = requests.post(url, data=json.dumps(data), headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code == 200:
             print('license key installed')
             return True
