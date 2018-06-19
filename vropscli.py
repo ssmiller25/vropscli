@@ -5,6 +5,7 @@ import json
 import pprint
 import dateparser
 import fire
+import csv
 
 
 class vropscli:
@@ -21,8 +22,8 @@ class vropscli:
         response_parsed = json.loads(response.text)
         return response_parsed
 
-    def getAdapter(self, adapterID):
-        url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterID
+    def getAdapter(self, adapterId):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterId
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
@@ -33,7 +34,9 @@ class vropscli:
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
-        return response_parsed
+        print("id,Name,Type")
+        for instance in response_parsed["adapterInstancesInfoDto"]:
+            print(instance["id"] + "," + instance["resourceKey"]["name"] + "," + instance["resourceKey"]["adapterKindKey"])
 
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds" 
@@ -68,9 +71,57 @@ class vropscli:
         adapterinfo = self.getAdapter(adapterId)
         settingsinfo = {}
         for setting in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+            #settingsinfo.append({"name": setting["identifierType"]["name"], "value": setting["value"]})
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
-        return settingsinfo
-        #return(adapterinfo["resourceKey"]["resourceIdentifiers"]) 
+        #pprint.pprint(settingsinfo)
+        csvheader = []
+        csvrow = []
+        csvheader.append("name")
+        csvheader.append("description")
+        csvrow.append(adapterinfo["resourceKey"]["name"])
+        csvrow.append(adapterinfo["description"])
+        for configparam in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+            csvheader.append(configparam["identifierType"]["name"])
+            csvrow.append(configparam["value"])
+        print(','.join(csvheader))
+        print(','.join(csvrow))
+
+    def createAdapterInstances(self, adapterKind, resourceConfigFile, credentialId, collectorId=1, autostart=False):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
+
+        for row in resourceConfig:
+            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
+            resourceConfigItems = []
+
+            for name, value in row.items():
+                if (name == 'name') or (name == 'description') :
+                    continue
+                resourceConfigItems.append({'name':name, 'value':value})
+
+            newadapterdata= {
+                "name": row['name'],
+                "description": row['description'],
+                "collectorId": collectorId,
+                "adapterKindKey": adapterKind,
+                "resourceIdentifiers": resourceConfigItems,
+                "credential": {
+                    "id": credentialId
+                }
+            }
+            url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+            r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+            if r.status_code < 300:
+                print(row['name'] + ' Adapter Successfully Installed')
+                if autostart == True:
+                    returndata=json.loads(r.text)
+                    self.startAdapterInstance(adapterId=returndata["id"])
+            else:
+                print(row['name'] + ' Failed!')
+                print(str(r.status_code))
+                print(r.text)
+
+        
         
 
     def getResourcesOfAdapterKind(self, adapterkey):
@@ -105,7 +156,16 @@ class vropscli:
             print(str(r.status_code))
             return False
 
+    def getCredentials(self):
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials"
 
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        credssum = {}
+        response_parsed = json.loads(response.text)
+        #return(response_parsed)
+        for credentialInstances in response_parsed['credentialInstances']:
+            credssum[credentialInstances["id"]]={'id': credentialInstances["id"], 'name': credentialInstances["name"], 'kind': credentialInstances["adapterKindKey"]}
+        return credssum
 
     def getSolutionLicense(self, solutionId):
         '''
@@ -235,16 +295,16 @@ class vropscli:
         else:
             print('Failed to Get Pak Info')
 
-    def stopAdapterInstance(self, adapterID):
+    def stopAdapterInstance(self, adapterId):
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/stop'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/stop'
         #A put request to turn off the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("This might have done something, but you aren't too certain")
 
-    def startAdapterInstance(self, adapterID):
+    def startAdapterInstance(self, adapterId):
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/start'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/start'
         #A put request to turn on the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("This should turn things on...right?")
