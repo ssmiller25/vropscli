@@ -5,7 +5,7 @@ import json
 import pprint
 import dateparser
 import fire
-import ast
+import csv
 
 
 class vropscli:
@@ -22,8 +22,8 @@ class vropscli:
         response_parsed = json.loads(response.text)
         return response_parsed
 
-    def getAdapter(self, adapterID):
-        url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterID
+    def getAdapter(self, adapterId):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterId
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
@@ -77,50 +77,49 @@ class vropscli:
         csvheader = []
         csvrow = []
         csvheader.append("name")
+        csvheader.append("description")
         csvrow.append(adapterinfo["resourceKey"]["name"])
+        csvrow.append(adapterinfo["description"])
         for configparam in adapterinfo["resourceKey"]["resourceIdentifiers"]:
             csvheader.append(configparam["identifierType"]["name"])
             csvrow.append(configparam["value"])
-        print(csvheader)
-        print(csvrow)
+        print(','.join(csvheader))
+        print(','.join(csvrow))
 
-    def createAdapterInstance(self, name, adapterKind, resourceParams, credentialId, description="", collectorId=1):
-        resourceConfigPassed = {}
-        print(resourceParams)
-        try:
-            resourceConfigPassed = ast.literal_eval(resourceParams)
-        except:
-            print("Warning: Malformed string resourceParams")
-            return False
+    def createAdapterInstances(self, adapterKind, resourceConfigFile, credentialId, collectorId=1, autostart=False):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
 
-        resourceConfig = []
-        for resourcekey, resourcevalue in resourceConfigPassed.items():
-            resourceConfig.append({'name': resourcekey, 'value': resourcevalue})
-            
+        for row in resourceConfig:
+            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
+            resourceConfigItems = []
 
-        newadapterdata= {
-            "name": name,
-            "description": description,
-            "collectorId": collectorId,
-            "adapterKindKey": adapterKind,
-            "resourceIdentifiers": resourceConfig,
-            "credentials": {
-                "id": credentialId
+            for name, value in row.items():
+                if (name == 'name') or (name == 'description') :
+                    continue
+                resourceConfigItems.append({'name':name, 'value':value})
+
+            newadapterdata= {
+                "name": row['name'],
+                "description": row['description'],
+                "collectorId": collectorId,
+                "adapterKindKey": adapterKind,
+                "resourceIdentifiers": resourceConfigItems,
+                "credential": {
+                    "id": credentialId
+                }
             }
-        }
-
-        return newadapterdata
-
-        #url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
-        #r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
-        #if r.status_code < 300:
-        #    print('New Adapter Installed')
-        #    return True
-        #else:
-        #    print('Failed to install license for ' + solutionId)
-        #    print(str(r.status_code))
-        #    print(r.text)
-        #    return False
+            url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+            r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+            if r.status_code < 300:
+                print(row['name'] + ' Adapter Successfully Installed')
+                if autostart == True:
+                    returndata=json.loads(r.text)
+                    self.startAdapterInstance(adapterId=returndata["id"])
+            else:
+                print(row['name'] + ' Failed!')
+                print(str(r.status_code))
+                print(r.text)
 
         
         
@@ -296,16 +295,16 @@ class vropscli:
         else:
             print('Failed to Get Pak Info')
 
-    def stopAdapterInstance(self, adapterID):
+    def stopAdapterInstance(self, adapterId):
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/stop'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/stop'
         #A put request to turn off the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("This might have done something, but you aren't too certain")
 
-    def startAdapterInstance(self, adapterID):
+    def startAdapterInstance(self, adapterId):
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/start'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/start'
         #A put request to turn on the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("This should turn things on...right?")
