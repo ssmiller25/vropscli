@@ -300,20 +300,23 @@ class vropscli:
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/stop'
         #A put request to turn off the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
-        print("This might have done something, but you aren't too certain")
+        print("Adapter Stopped")
+        return 0
 
     def startAdapterInstance(self, adapterId):
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/start'
         #A put request to turn on the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
-        print("This should turn things on...right?")
+        print("Adapter Started")
+        return 0
 
     def __init__(self):
         requests.packages.urllib3.disable_warnings()
         # Just Source Config
         self.config=clilib.getConfig()["default"]
         self.token=clilib.getToken(self.config)
+
 
 #scalpel=tpscalpel()
 
