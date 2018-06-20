@@ -11,13 +11,14 @@ from math import ceil
 from yaml import load
 from sys import exit
 from os import path
+from pathlib import Path
 
 def getConfig():
     '''
     Function returns a yaml object of the default config file
-    File should live in '~/.config/vropstp.yml'
+    File should live in '~/.vropstp.yml'
     '''
-    configfile="~/.config/vropscli.yml"
+    configfile=path.join(str(Path.home()), ".vropscli.yml")
     try:
         with open(path.expanduser(configfile),"r") as c:
             config = load(c)
