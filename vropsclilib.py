@@ -5,7 +5,6 @@ import logging
 import re
 import sys
 import time
-import datetime
 import json 
 from math import ceil
 from yaml import load

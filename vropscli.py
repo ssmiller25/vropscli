@@ -3,7 +3,6 @@ import vropsclilib as clilib
 import requests
 import json
 import pprint
-import dateparser
 import fire
 import csv
 
