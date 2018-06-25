@@ -242,8 +242,19 @@ class vropscli:
         resources = requests.get(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         #filter down to the collection status
         #Currently grabs everything within the resourceStatusStates and needs to be filtered down to just resourceStatus
-        collectionStatus = (json.loads(resources.text)["resourceList"][0]["resourceStatusStates"])
-        return collectionStatus
+        #If the object is down let the user know
+        resourceState = (json.loads(resources.text)["resourceList"][0]["resourceStatusStates"][0]["resourceState"])
+       
+        #There is the option for it to be UNKNOWN and it isn't accounted for
+        if resourceState == "NOT_EXISTING":
+            print("The adapter is powered off")
+        elif resourceState == "STARTED":
+            print("The adapter is powered on")
+            #Get the adapters resource status, hopefully data_receiving
+            resourceStatus = (json.loads(resources.text)["resourceList"][0]["resourceStatusStates"][0]["resourceStatus"])
+            #if the resourceStatus is DATA_RECEIVING let the user know they are collecting data
+            if resourceStatus == "DATA_RECEIVING":
+                print("The adapter is collecting succesfully")
 
     def stopAdapterInstance(self, adapterID):
         #set the url for the adapter instance
