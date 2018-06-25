@@ -120,7 +120,44 @@ class vropscli:
                 print(str(r.status_code))
                 print(r.text)
 
-        
+
+    def updateAdapterInstance(self, resourceConfigFile, autostart=False):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
+
+        for row in resourceConfig:
+            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
+            resourceConfigItems = []
+
+            for name, value in row.items():
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
+                    continue
+                resourceConfigItems.append({  "identifierType":{ "name" : name,"dataType" : "STRING"}, 'value':value})
+
+            newadapterdata= {
+                "resourceKey": {
+                    "name": row['name'],
+                    "resourceKindKey": row['resourceKind'],
+                    "adapterKindKey": row['adapterKind'],
+                    "resourceIdentifiers": resourceConfigItems},
+                "id": row['adapterkey'],
+                "credentialInstanceId": row['credentialId'],
+                "description": row['description'],
+                "collectorId": row['collectorId']
+            }
+
+            # print(newadapterdata)
+            url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+            r = requests.put(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+            if r.status_code < 300:
+                print(row['name'] + ' Adapter Successfully Updated')
+                if autostart == True:
+                    returndata=json.loads(r.text)
+                    self.startAdapterInstance(adapterId=returndata["id"])
+            else:
+                print(row['name'] + ' Failed!')
+                print(str(r.status_code))
+                print(r.text)        
         
 
     def getResourcesOfAdapterKind(self, adapterkey):
