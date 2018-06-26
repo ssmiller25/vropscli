@@ -85,6 +85,35 @@ class vropscli:
         print(','.join(csvheader))
         print(','.join(csvrow))
 
+    def getAdaptersConfigs(self, adapterKindKey):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters/?adapterKindKey=" + adapterKindKey
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+
+        settingsinfo = {}
+        firstRun = 'true'
+        response_parsed = json.loads(response.text)
+
+        for adapterInfo in response_parsed["adapterInstancesInfoDto"]:
+            csvrow = []
+            csvrow.append(adapterInfo["id"])
+            csvrow.append(adapterKindKey)
+            csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
+            csvrow.append(adapterInfo["credentialInstanceId"])
+            csvrow.append(adapterInfo["collectorId"])
+            csvrow.append(adapterInfo["resourceKey"]["name"])
+            csvrow.append(adapterInfo["description"])
+      
+            for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
+                if (firstRun == 'true'): 
+                    csvheader.append(configparam["identifierType"]["name"])
+                csvrow.append(configparam["value"])
+            if (firstRun == 'true'): 
+                print(','.join(csvheader))
+            print(','.join(map(str, csvrow)))
+            firstRun = 'false'    
+
     def createAdapterInstances(self, adapterKind, resourceConfigFile, credentialId, collectorId=1, autostart=False):
         resourceConfigData = open(resourceConfigFile, newline='')
         resourceConfig = csv.DictReader(resourceConfigData)
@@ -126,7 +155,6 @@ class vropscli:
         resourceConfig = csv.DictReader(resourceConfigData)
 
         for row in resourceConfig:
-            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
             resourceConfigItems = []
 
             for name, value in row.items():
@@ -146,11 +174,12 @@ class vropscli:
                 "collectorId": row['collectorId']
             }
 
-            # print(newadapterdata)
+            #print(newadapterdata)
             url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
             r = requests.put(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
             if r.status_code < 300:
-                print(row['name'] + ' Adapter Successfully Updated')
+                print(row['name'] + ' Adapter Successfully Updated - ' + str(r.status_code))
+                #print(r.text)
                 if autostart == True:
                     returndata=json.loads(r.text)
                     self.startAdapterInstance(adapterId=returndata["id"])
