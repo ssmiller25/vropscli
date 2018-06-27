@@ -3,8 +3,8 @@ import vropsclilib as clilib
 import requests
 import json
 import pprint
-import dateparser
 import fire
+import csv
 
 
 class vropscli:
@@ -21,8 +21,8 @@ class vropscli:
         response_parsed = json.loads(response.text)
         return response_parsed
 
-    def getAdapter(self, adapterID):
-        url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterID
+    def getAdapter(self, adapterId):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterId
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
@@ -33,7 +33,9 @@ class vropscli:
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
-        return response_parsed
+        print("id,Name,Type")
+        for instance in response_parsed["adapterInstancesInfoDto"]:
+            print(instance["id"] + "," + instance["resourceKey"]["name"] + "," + instance["resourceKey"]["adapterKindKey"])
 
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds" 
@@ -65,12 +67,135 @@ class vropscli:
         #    print
 
     def getAdapterConfig(self, adapterId):
-        adapterinfo = self.getAdapter(adapterId)
+        adapterInfo = self.getAdapter(adapterId)
         settingsinfo = {}
-        for setting in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+        for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
-        return settingsinfo
-        #return(adapterinfo["resourceKey"]["resourceIdentifiers"]) 
+        csvheader = []
+        csvrow = []
+        #csvheader.append("name")
+        #csvheader.append("description")
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+        #csvrow.append(adapterInfo["resourceKey"]["name"])
+        #csvrow.append(adapterInfo["description"])
+        csvrow.append(adapterInfo["id"])
+        csvrow.append(adapterInfo["resourceKey"]["adapterKindKey"])
+        csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
+        csvrow.append(adapterInfo["credentialInstanceId"])
+        csvrow.append(adapterInfo["collectorId"])
+        csvrow.append(adapterInfo["resourceKey"]["name"])
+        csvrow.append(adapterInfo["description"])
+
+        for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
+            csvheader.append(configparam["identifierType"]["name"])
+            csvrow.append(configparam["value"])
+        print(','.join(csvheader))
+        print(','.join(map(str,csvrow)))
+
+    def getAdapterConfigs(self, adapterKindKey):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters/?adapterKindKey=" + adapterKindKey
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+
+        settingsinfo = {}
+        firstRun = 'true'
+        response_parsed = json.loads(response.text)
+
+        for adapterInfo in response_parsed["adapterInstancesInfoDto"]:
+            csvrow = []
+            csvrow.append(adapterInfo["id"])
+            csvrow.append(adapterKindKey)
+            csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
+            csvrow.append(adapterInfo["credentialInstanceId"])
+            csvrow.append(adapterInfo["collectorId"])
+            csvrow.append(adapterInfo["resourceKey"]["name"])
+            csvrow.append(adapterInfo["description"])
+      
+            for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
+                if (firstRun == 'true'): 
+                    csvheader.append(configparam["identifierType"]["name"])
+                csvrow.append(configparam["value"])
+            if (firstRun == 'true'): 
+                print(','.join(csvheader))
+            print(','.join(map(str, csvrow)))
+            firstRun = 'false'    
+
+    def createAdapterInstances(self, resourceConfigFile, autostart=False):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
+
+        for row in resourceConfig:
+            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
+            resourceConfigItems = []
+
+            for name, value in row.items():
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
+                    continue
+                resourceConfigItems.append({"name" : name, 'value':value})
+
+            newadapterdata= {
+                "name": row['name'],
+                "description": row['description'],
+                "collectorId": row['collectorId'],
+                "adapterKindKey": row['adapterKind'],
+                "resourceIdentifiers": resourceConfigItems,
+                "credential": { 
+                    "id": row['credentialId']
+                }
+            }
+            url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+            r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+            if r.status_code < 300:
+                print(row['name'] + ' Adapter Successfully Installed')
+                if autostart == True:
+                    returndata=json.loads(r.text)
+                    self.startAdapterInstance(adapterId=returndata["id"])
+            else:
+                print(row['name'] + ' Failed!')
+                print(str(r.status_code))
+                print(r.text)
+                print("Submitted Data")
+                print(newadapterdata)
+
+
+    def updateAdapterInstances(self, resourceConfigFile, autostart=False):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
+
+        for row in resourceConfig:
+            resourceConfigItems = []
+
+            for name, value in row.items():
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
+                    continue
+                resourceConfigItems.append({  "identifierType":{ "name" : name,"dataType" : "STRING"}, 'value':value})
+
+            newadapterdata= {
+                "resourceKey": {
+                    "name": row['name'],
+                    "resourceKindKey": row['resourceKind'],
+                    "adapterKindKey": row['adapterKind'],
+                    "resourceIdentifiers": resourceConfigItems},
+                "id": row['adapterkey'],
+                "credentialInstanceId": row['credentialId'],
+                "description": row['description'],
+                "collectorId": row['collectorId']
+            }
+
+            #print(newadapterdata)
+            url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+            r = requests.put(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+            if r.status_code < 300:
+                print(row['name'] + ' Adapter Successfully Updated - ' + str(r.status_code))
+                #print(r.text)
+                if autostart == True:
+                    returndata=json.loads(r.text)
+                    self.startAdapterInstance(adapterId=returndata["id"])
+            else:
+                print(row['name'] + ' Failed!')
+                print(str(r.status_code))
+                print(r.text)        
         
 
     def getResourcesOfAdapterKind(self, adapterkey):
@@ -105,7 +230,16 @@ class vropscli:
             print(str(r.status_code))
             return False
 
+    def getCredentials(self):
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials"
 
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        credssum = {}
+        response_parsed = json.loads(response.text)
+        #return(response_parsed)
+        for credentialInstances in response_parsed['credentialInstances']:
+            credssum[credentialInstances["id"]]={'id': credentialInstances["id"], 'name': credentialInstances["name"], 'kind': credentialInstances["adapterKindKey"]}
+        return credssum
 
     def getSolutionLicense(self, solutionId):
         '''
@@ -132,7 +266,7 @@ class vropscli:
         return json.loads(r.text)
 
 
-    def setVropsLicense(self, license_key='u442m-4421l-0818d-08900-1x51j'):
+    def setVropsLicense(self, license_key):
         '''
         vrops license key
         '''
@@ -148,7 +282,7 @@ class vropscli:
         }
 
         #TODO: Make use a token request
-        r = requests.post(url, data=dumps(data), headers=get_headers(), auth=requests.auth.HTTPBasicAuth(user, password), verify=False)
+        r = requests.post(url, data=json.dumps(data), headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code == 200:
             print('license key installed')
             return True
@@ -258,23 +392,26 @@ class vropscli:
 
     def stopAdapterInstance(self, adapterID):
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/stop'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/stop'
         #A put request to turn off the adapter
-        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
-        print("This might have done something, but you aren't too certain")
+        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        print("Adapter Stopped")
+        return 0
 
-    def startAdapterInstance(self, adapterID):
+    def startAdapterInstance(self, adapterId):
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterID + '/monitoringstate/start'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/start'
         #A put request to turn on the adapter
-        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
-        print("This should turn things on...right?")
+        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        print("Adapter Started")
+        return 0
 
     def __init__(self):
         requests.packages.urllib3.disable_warnings()
         # Just Source Config
-        self.config=clilib.getConfig()["config"]
+        self.config=clilib.getConfig()["default"]
         self.token=clilib.getToken(self.config)
+
 
 #scalpel=tpscalpel()
 
