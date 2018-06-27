@@ -12,7 +12,7 @@ Test by running ```vropscli getAdapters``` and verify you are getting current in
 
 # Install/Upgrade Management Packs
 
-First, you will need to uplaod the management pack...this may take some time
+First, you will need to upload the management pack...this may take some time
 ```
 vropscli uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak
 ```
@@ -20,7 +20,7 @@ Once the upload is done, you will be provided with a pak_id.  Use that to start 
 ```
 vropscli installPak OracleDatabase-12020180319144115
 ```
-You can track the current progress wtih
+You can track the current progress with
 ```
 vropscli getCurrentActivity
 ```
@@ -39,7 +39,7 @@ Use the "id" from above for the correct management pack to install the license
 vropscli setSolutionLicense OracleDatabase 4/trialparticipant/06-20-2018-17:30:18/BM-VREALIZE-ORACLE-DB/trial/06-22-2018-17:30:18/MP/accumulating/BM-VREALIZE-ORACLE-DB/Unlimited/C4B2F9E09CF0BADB867F1DAAF32AEAC6DDAF6473
 ```
 
-Get current lienses installed
+Get current licenses installed
 
 ```
 vropscli getSolutionLicense OracleDatabase
@@ -80,7 +80,7 @@ First, setup one instance of the adapter will all settings and credentials.  Onc
 ```
 vropscli getAdapters
 ```
-The Name is the second fieldd.  Record the following info for the adapter you just created
+The Name is the second field.  Record the following info for the adapter you just created
 * UUID (first field)
 * AdapterKind (3rd field)
 
@@ -96,7 +96,7 @@ vropscli getAdapterConfig  62cae133-2233-4880-9136-a07e2f00ecfa > newadapter.csv
 vropscli getCredentials 
 ```
 
-## Adjust the CSV file to include all the new instances based on the exampel you created.  The inital "example" should be
+## Adjust the CSV file to include all the new instances based on the example you created.  The initial "example" should be
 removed from the csv.  You should leave the adapterKey blank.  Once complete, create the new instances
 
 ```
@@ -114,7 +114,7 @@ vropscli createAdapterInstances newadapter.csv
 vropscli getAdapterKinds
 ```
 
-## Generate an CSV of the existing configurs
+## Generate an CSV of the existing configuration
 
 ```
 vropscli getAdaptersConfigs POSTGRESQL_ADAPTER > adapter.csv
