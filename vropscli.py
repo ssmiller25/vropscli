@@ -382,21 +382,30 @@ class vropscli:
         #There is the option for it to be UNKNOWN and it isn't accounted for
         if resourceState == "NOT_EXISTING":
             print("The adapter is powered off")
+            exit(1)
         elif resourceState == "STARTED":
-            print("The adapter is powered on")
             #Get the adapters resource status, hopefully data_receiving
             resourceStatus = (json.loads(resources.text)["resourceList"][0]["resourceStatusStates"][0]["resourceStatus"])
             #if the resourceStatus is DATA_RECEIVING let the user know they are collecting data
             if resourceStatus == "DATA_RECEIVING":
-                print("The adapter is collecting succesfully")
+                print("The adapter is on and collecting succesfully")
+                exit(0)
+            elif resourceStatus == "NO_PARENT_MONITORING":
+                print("The adapter is powered off")
+                exit(1)
+            else:
+                print("The adapter in on, but not collecting.  Status is " + resourceStatus)
+                exit(1)
+        else:
+            print("Unknown adapter state: " + resourceState)
+            exit(1)
 
-    def stopAdapterInstance(self, adapterID):
+    def stopAdapterInstance(self, adapterId):
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/stop'
         #A put request to turn off the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Stopped")
-        return 0
 
     def startAdapterInstance(self, adapterId):
         #set the url for the adapter instance
@@ -404,7 +413,6 @@ class vropscli:
         #A put request to turn on the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
-        return 0
 
     def __init__(self):
         requests.packages.urllib3.disable_warnings()
