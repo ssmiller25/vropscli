@@ -45,7 +45,7 @@ Get current lienses installed
 vropscli getSolutionLicense OracleDatabase
 ```
 
-# Stop/start Adapter Instances
+# Stop/Start Adapter Instances
 
 Lookup Adapter Instance UUIDs
 
@@ -64,6 +64,13 @@ Start Adapter Instance
 ```
 vropscli startAdapterInstance 9516b17d-f2a5-4da0-ab12-c4998dc0889e
 ```
+
+Checking the Status of Adapter Instances
+
+```
+vropscli getAdapterCollectionStatus 9516b17d-f2a5-4da0-ab12-c4998dc0889e
+```
+  Exit code will be 0 for successful collection, 1 for all other states
 
 # Creating new adapter instances
 
@@ -100,7 +107,7 @@ Example:
 vropscli createAdapterInstances newadapter.csv 
 ```
 
-# Updating Existing adapter instances
+# Updating Existing Adapter Instances
 
 ## Identify the Adapter kind of the adapters you wish to update
 ```
