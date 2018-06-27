@@ -20,5 +20,6 @@ Basic usage at [USAGE.md](USAGE.md)
 
 * On "target" platofrm (Windows, Mac, etc), run:
 ```
+pipenv install pyinstaller
 pyinstaller -F vropscli.py
 ```
