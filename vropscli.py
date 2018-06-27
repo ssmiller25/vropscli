@@ -67,25 +67,32 @@ class vropscli:
         #    print
 
     def getAdapterConfig(self, adapterId):
-        adapterinfo = self.getAdapter(adapterId)
+        adapterInfo = self.getAdapter(adapterId)
         settingsinfo = {}
-        for setting in adapterinfo["resourceKey"]["resourceIdentifiers"]:
-            #settingsinfo.append({"name": setting["identifierType"]["name"], "value": setting["value"]})
+        for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
-        #pprint.pprint(settingsinfo)
         csvheader = []
         csvrow = []
-        csvheader.append("name")
-        csvheader.append("description")
-        csvrow.append(adapterinfo["resourceKey"]["name"])
-        csvrow.append(adapterinfo["description"])
-        for configparam in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+        #csvheader.append("name")
+        #csvheader.append("description")
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+        #csvrow.append(adapterInfo["resourceKey"]["name"])
+        #csvrow.append(adapterInfo["description"])
+        csvrow.append(adapterInfo["id"])
+        csvrow.append(adapterInfo["resourceKey"]["adapterKindKey"])
+        csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
+        csvrow.append(adapterInfo["credentialInstanceId"])
+        csvrow.append(adapterInfo["collectorId"])
+        csvrow.append(adapterInfo["resourceKey"]["name"])
+        csvrow.append(adapterInfo["description"])
+
+        for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
             csvheader.append(configparam["identifierType"]["name"])
             csvrow.append(configparam["value"])
         print(','.join(csvheader))
-        print(','.join(csvrow))
+        print(','.join(map(str,csvrow)))
 
-    def getAdaptersConfigs(self, adapterKindKey):
+    def getAdapterConfigs(self, adapterKindKey):
         url = "https://" + self.config['host'] + "/suite-api/api/adapters/?adapterKindKey=" + adapterKindKey
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
 
