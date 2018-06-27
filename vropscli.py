@@ -121,7 +121,7 @@ class vropscli:
             print(','.join(map(str, csvrow)))
             firstRun = 'false'    
 
-    def createAdapterInstances(self, adapterKind, resourceConfigFile, credentialId, collectorId=1, autostart=False):
+    def createAdapterInstances(self, resourceConfigFile, autostart=False):
         resourceConfigData = open(resourceConfigFile, newline='')
         resourceConfig = csv.DictReader(resourceConfigData)
 
@@ -130,18 +130,18 @@ class vropscli:
             resourceConfigItems = []
 
             for name, value in row.items():
-                if (name == 'name') or (name == 'description') :
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
                     continue
-                resourceConfigItems.append({'name':name, 'value':value})
+                resourceConfigItems.append({"name" : name, 'value':value})
 
             newadapterdata= {
                 "name": row['name'],
                 "description": row['description'],
-                "collectorId": collectorId,
-                "adapterKindKey": adapterKind,
+                "collectorId": row['collectorId'],
+                "adapterKindKey": row['adapterKind'],
                 "resourceIdentifiers": resourceConfigItems,
-                "credential": {
-                    "id": credentialId
+                "credential": { 
+                    "id": row['credentialId']
                 }
             }
             url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
@@ -155,9 +155,11 @@ class vropscli:
                 print(row['name'] + ' Failed!')
                 print(str(r.status_code))
                 print(r.text)
+                print("Submitted Data")
+                print(newadapterdata)
 
 
-    def updateAdapterInstance(self, resourceConfigFile, autostart=False):
+    def updateAdapterInstances(self, resourceConfigFile, autostart=False):
         resourceConfigData = open(resourceConfigFile, newline='')
         resourceConfig = csv.DictReader(resourceConfigData)
 
