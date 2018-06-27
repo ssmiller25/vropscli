@@ -65,11 +65,11 @@ Start Adapter Instance
 vropscli startAdapterInstance 9516b17d-f2a5-4da0-ab12-c4998dc0889e
 ```
 
-# Setup new adapter instances
+# Creating new adapter instances
 
 First, setup one instance of the adapter will all settings and credentials.  Once you have confirmed that works
 
-## Determein the specific adapter and the AdapterKind from the example you created 
+## Determine the specific adapter and the AdapterKind from the example you created 
 ```
 vropscli getAdapters
 ```
@@ -77,25 +77,54 @@ The Name is the second fieldd.  Record the following info for the adapter you ju
 * UUID (first field)
 * AdapterKind (3rd field)
 
-## Generate an example CSV file based on the example you created, using hte AdapterKind for step 1
+## Generate an example CSV file based on the example you created, using the AdapterKind for step 1
 
 ```
 vropscli getAdapterConfig  62cae133-2233-4880-9136-a07e2f00ecfa > newadapter.csv
 ```
 
-## Get the UUID of the credential you are planning to use with your other instances
+## If you are using a different credential for the new adapters, obtain the UUID that credential
 
 ```
 vropscli getCredentials 
 ```
 
-## Adjust the CSV file to include all the new instances based on the exampel you created.  The inital "exmaple" should be
-removed from the csv.  Once complete, create the new instances
+## Adjust the CSV file to include all the new instances based on the exampel you created.  The inital "example" should be
+removed from the csv.  You should leave the adapterKey blank.  Once complete, create the new instances
 
 ```
-vropscli createAdapterInstances <AdapterKind> <CSVfile> <UUID of credential> 
+vropscli createAdapterInstances <CSVfile> 
 ```
 Example:
 ```
-vropscli createAdapterInstances NAGIOS_ADAPTER adapter.csv 2de121e4-9550-443f-93a0-181865d01045
+vropscli createAdapterInstances newadapter.csv 
+```
+
+# Updating Existing adapter instances
+
+## Identify the Adapter kind of the adapters you wish to update
+```
+vropscli getAdapterKinds
+```
+
+## Generate an CSV of the existing configurs
+
+```
+vropscli getAdaptersConfigs POSTGRESQL_ADAPTER > adapter.csv
+```
+
+## If you are planning to change credentials, obtain the UUID of the new credential
+
+```
+vropscli getCredentials 
+```
+
+## Adjust the CSV file, then run the update process
+
+```
+vropscli updateAdapterInstances <CSVfile> 
+```
+Example:
+```
+vropscli updateAdapterInstances nagios-existing.csv
 ```

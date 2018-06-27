@@ -67,25 +67,61 @@ class vropscli:
         #    print
 
     def getAdapterConfig(self, adapterId):
-        adapterinfo = self.getAdapter(adapterId)
+        adapterInfo = self.getAdapter(adapterId)
         settingsinfo = {}
-        for setting in adapterinfo["resourceKey"]["resourceIdentifiers"]:
-            #settingsinfo.append({"name": setting["identifierType"]["name"], "value": setting["value"]})
+        for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
-        #pprint.pprint(settingsinfo)
         csvheader = []
         csvrow = []
-        csvheader.append("name")
-        csvheader.append("description")
-        csvrow.append(adapterinfo["resourceKey"]["name"])
-        csvrow.append(adapterinfo["description"])
-        for configparam in adapterinfo["resourceKey"]["resourceIdentifiers"]:
+        #csvheader.append("name")
+        #csvheader.append("description")
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+        #csvrow.append(adapterInfo["resourceKey"]["name"])
+        #csvrow.append(adapterInfo["description"])
+        csvrow.append(adapterInfo["id"])
+        csvrow.append(adapterInfo["resourceKey"]["adapterKindKey"])
+        csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
+        csvrow.append(adapterInfo["credentialInstanceId"])
+        csvrow.append(adapterInfo["collectorId"])
+        csvrow.append(adapterInfo["resourceKey"]["name"])
+        csvrow.append(adapterInfo["description"])
+
+        for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
             csvheader.append(configparam["identifierType"]["name"])
             csvrow.append(configparam["value"])
         print(','.join(csvheader))
-        print(','.join(csvrow))
+        print(','.join(map(str,csvrow)))
 
-    def createAdapterInstances(self, adapterKind, resourceConfigFile, credentialId, collectorId=1, autostart=False):
+    def getAdapterConfigs(self, adapterKindKey):
+        url = "https://" + self.config['host'] + "/suite-api/api/adapters/?adapterKindKey=" + adapterKindKey
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+
+        settingsinfo = {}
+        firstRun = 'true'
+        response_parsed = json.loads(response.text)
+
+        for adapterInfo in response_parsed["adapterInstancesInfoDto"]:
+            csvrow = []
+            csvrow.append(adapterInfo["id"])
+            csvrow.append(adapterKindKey)
+            csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
+            csvrow.append(adapterInfo["credentialInstanceId"])
+            csvrow.append(adapterInfo["collectorId"])
+            csvrow.append(adapterInfo["resourceKey"]["name"])
+            csvrow.append(adapterInfo["description"])
+      
+            for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
+                if (firstRun == 'true'): 
+                    csvheader.append(configparam["identifierType"]["name"])
+                csvrow.append(configparam["value"])
+            if (firstRun == 'true'): 
+                print(','.join(csvheader))
+            print(','.join(map(str, csvrow)))
+            firstRun = 'false'    
+
+    def createAdapterInstances(self, resourceConfigFile, autostart=False):
         resourceConfigData = open(resourceConfigFile, newline='')
         resourceConfig = csv.DictReader(resourceConfigData)
 
@@ -94,18 +130,18 @@ class vropscli:
             resourceConfigItems = []
 
             for name, value in row.items():
-                if (name == 'name') or (name == 'description') :
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
                     continue
-                resourceConfigItems.append({'name':name, 'value':value})
+                resourceConfigItems.append({"name" : name, 'value':value})
 
             newadapterdata= {
                 "name": row['name'],
                 "description": row['description'],
-                "collectorId": collectorId,
-                "adapterKindKey": adapterKind,
+                "collectorId": row['collectorId'],
+                "adapterKindKey": row['adapterKind'],
                 "resourceIdentifiers": resourceConfigItems,
-                "credential": {
-                    "id": credentialId
+                "credential": { 
+                    "id": row['credentialId']
                 }
             }
             url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
@@ -119,8 +155,47 @@ class vropscli:
                 print(row['name'] + ' Failed!')
                 print(str(r.status_code))
                 print(r.text)
+                print("Submitted Data")
+                print(newadapterdata)
 
-        
+
+    def updateAdapterInstances(self, resourceConfigFile, autostart=False):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
+
+        for row in resourceConfig:
+            resourceConfigItems = []
+
+            for name, value in row.items():
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
+                    continue
+                resourceConfigItems.append({  "identifierType":{ "name" : name,"dataType" : "STRING"}, 'value':value})
+
+            newadapterdata= {
+                "resourceKey": {
+                    "name": row['name'],
+                    "resourceKindKey": row['resourceKind'],
+                    "adapterKindKey": row['adapterKind'],
+                    "resourceIdentifiers": resourceConfigItems},
+                "id": row['adapterkey'],
+                "credentialInstanceId": row['credentialId'],
+                "description": row['description'],
+                "collectorId": row['collectorId']
+            }
+
+            #print(newadapterdata)
+            url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+            r = requests.put(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+            if r.status_code < 300:
+                print(row['name'] + ' Adapter Successfully Updated - ' + str(r.status_code))
+                #print(r.text)
+                if autostart == True:
+                    returndata=json.loads(r.text)
+                    self.startAdapterInstance(adapterId=returndata["id"])
+            else:
+                print(row['name'] + ' Failed!')
+                print(str(r.status_code))
+                print(r.text)        
         
 
     def getResourcesOfAdapterKind(self, adapterkey):
