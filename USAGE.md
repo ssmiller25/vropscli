@@ -77,7 +77,7 @@ The Name is the second fieldd.  Record the following info for the adapter you ju
 * UUID (first field)
 * AdapterKind (3rd field)
 
-## Generate an example CSV file based on the example you created, using hte AdapterKind for step 1
+## Generate an example CSV file based on the example you created, using the AdapterKind for step 1
 
 ```
 vropscli getAdapterConfig  62cae133-2233-4880-9136-a07e2f00ecfa > newadapter.csv
@@ -90,7 +90,7 @@ vropscli getCredentials
 ```
 
 ## Adjust the CSV file to include all the new instances based on the exampel you created.  The inital "example" should be
-removed from the csv.  Once complete, create the new instances
+removed from the csv.  You should leave the adapterKey blank.  Once complete, create the new instances
 
 ```
 vropscli createAdapterInstances <CSVfile> 
