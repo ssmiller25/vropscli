@@ -90,7 +90,7 @@ The Name is the second field.  Record the following info for the adapter you jus
 vropscli getAdapterConfig  62cae133-2233-4880-9136-a07e2f00ecfa > newadapter.csv
 ```
 
-## If you are using a different credential for the new adapters, obtain the UUID that credential
+## If you are using a different credential for the new adapters, obtain the UUID of that credential
 
 ```
 vropscli getCredentials 
