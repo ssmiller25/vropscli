@@ -120,8 +120,23 @@ class vropscli:
                 print(str(r.status_code))
                 print(r.text)
 
+    def deleteAdapterInstances(self, resourceConfigFile):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
+
+        for row in resourceConfig:
+            self.deleteAdapterInstance(adapterkey=row['adapterkey'])
+
         
-        
+    def deleteAdapterInstance(self, adapterkey):
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterkey
+        r = requests.delete(url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        if r.status_code < 300:
+            print(adapterkey + ' adapter successfully deleted.')
+        else:
+            print(adapterkey + ' delete failed!')
+            print(str(r.status_code))
+            print(r.text)
 
     def getResourcesOfAdapterKind(self, adapterkey):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterkey + '/resources'
