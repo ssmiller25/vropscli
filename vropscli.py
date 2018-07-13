@@ -122,6 +122,97 @@ class vropscli:
             print(','.join(map(str, csvrow)))
             firstRun = 'false'    
 
+    def getAlertsDefinitionsByAdapterKind(self, adapterKindKey):
+        url = "https://" + self.config['host'] + "/suite-api/api/alertdefinitions?adapterKind=" + adapterKindKey
+
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        print("{\"alertDefinitions\": " + json.dumps(response_parsed["alertDefinitions"]) + "}")
+
+    def updateAlertDefinitions(self, alertConfigFile):
+        with open(alertConfigFile) as jsonFile:
+            alertDefinitions = json.load(jsonFile)
+
+        url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions'
+        for alertDefinition in alertDefinitions["alertDefinitions"]:
+            r = requests.put(url, data=json.dumps(alertDefinition), headers=clilib.get_token_header(self.token['token']), verify=False)
+
+            if r.status_code < 300:
+                print(alertDefinition["name"] + ' updated successfully.')
+            else:
+                print(alertDefinition["name"]  + ' update failed!')
+                print(str(r.status_code))
+                print(r.text)
+                print("Submitted Data")
+                print(json.dumps(alertDefinition))
+
+    def generateAlertTemplate(self):
+        newAlertData= {"alertDefinitions":[
+                {
+                  "adapterKindKey": "",
+                  "cancelCycles": 1,
+                  "description": "",
+                  "name": "",
+                  "resourceKindKey": "",
+                  "states": [
+                    {
+                      "base-symptom-set": {
+                        "aggregation": "ANY",
+                        "relation": "SELF",
+                        "symptomDefinitionIds": [
+                          ""
+                        ],
+                        "symptomSetOperator": "AND",
+                        "type": "SYMPTOM_SET"
+                      },
+                      "impact": {
+                        "detail": "health",
+                        "impactType": "BADGE"
+                      },
+                      "severity": ""
+                    }
+                  ],
+                  "subType": 18,
+                  "type": 19,
+                  "waitCycles": 1
+                }]
+        }
+        print(json.dumps(newAlertData))
+
+    def createAlertDefinitions(self, alertConfigFile):
+        with open(alertConfigFile) as jsonFile:
+            alertDefinitions = json.load(jsonFile)
+
+        for alertDefinition in alertDefinitions["alertDefinitions"]:
+            self.createAlertDefinition(adapterkey=alertDefinition)
+
+    def createAlertDefinition(self, alertJSON):
+        url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions/' + alertDefinitionKey
+        r = requests.post(url,  data=json.dumps(alertJSON), headers=clilib.get_token_header(self.token['token']), verify=False)
+        if r.status_code < 300:
+            print(adapterkey + ' alert successfully deleted.')
+        else:
+            print(adapterkey + ' delete failed!')
+            print(str(r.status_code))
+            print(r.text)       
+
+    def deleteAlertDefinitions(self, alertConfigFile):
+        with open(alertConfigFile) as jsonFile:
+            alertDefinitions = json.load(jsonFile)
+
+        for alertDefinition in alertDefinitions["alertDefinitions"]:
+            self.deleteAlertDefinition(adapterkey=alertDefinition['id'])
+
+    def deleteAlertDefinition(self, alertDefinitionKey):
+        url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions/' + alertDefinitionKey
+        r = requests.delete(url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        if r.status_code < 300:
+            print(adapterkey + ' alert successfully deleted.')
+        else:
+            print(adapterkey + ' delete failed!')
+            print(str(r.status_code))
+            print(r.text)
+
     def createAdapterInstances(self, resourceConfigFile, autostart=False):
         resourceConfigData = open(resourceConfigFile, newline='')
         resourceConfig = csv.DictReader(resourceConfigData)
