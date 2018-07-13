@@ -74,7 +74,7 @@ vropscli getAdapterCollectionStatus 9516b17d-f2a5-4da0-ab12-c4998dc0889e
 
 # 5 - Creating new adapter instances
 
-First, setup one instance of the adapter will all settings and credentials.  Once you have confirmed that works
+First, setup one instance of the adapter will all settings and credentials.  Once you have confirmed that works:
 
 1. Determine the specific adapter and the AdapterKind from the example you created 
 ```
@@ -83,19 +83,14 @@ vropscli getAdapters
 The Name is the second field.  Record the following info for the adapter you just created
 * UUID (first field)
 * AdapterKind (3rd field)
-
 1. Generate an example CSV file based on the example you created, using the AdapterKind for step 1
-
 ```
 vropscli getAdapterConfig  62cae133-2233-4880-9136-a07e2f00ecfa > newadapter.csv
 ```
-
 1. If you are using a different credential for the new adapters, obtain the UUID of that credential
-
 ```
 vropscli getCredentials 
 ```
-
 1. Adjust the CSV file to include all the new instances based on the example you created.  The initial "example" should be
 removed from the csv.  You should leave the adapterKey blank.  Once complete, create the new instances
 
@@ -113,21 +108,15 @@ vropscli createAdapterInstances newadapter.csv
 ```
 vropscli getAdapterKinds
 ```
-
 1. Generate an CSV of the existing configuration
-
 ```
 vropscli getAdaptersConfigs POSTGRESQL_ADAPTER > adapter.csv
 ```
-
 1. If you are planning to change credentials, obtain the UUID of the new credential
-
 ```
 vropscli getCredentials 
 ```
-
 1. Adjust the CSV file, then run the update process
-
 ```
 vropscli updateAdapterInstances <CSVfile> 
 ```
@@ -142,7 +131,6 @@ vropscli updateAdapterInstances nagios-existing.csv
 ```
 vropscli getAdapterKinds
 ```
-
 1. Generate an file of all existing alert definitions of the adapter type you wish to use
 ```
 vropscli getAlertsDefinitionsByAdapterKind <AdapterKind> > <file>
@@ -151,9 +139,7 @@ Example:
 ```
 vropscli getAlertsDefinitionsByAdapterKind HPE3PAR_ADAPTER > alert.json
 ```
-
 1. Modify the file as desired
-
 1. Use that file to update all existing alert definitions
 ```
 vropscli updateAlertDefinitions <file>
