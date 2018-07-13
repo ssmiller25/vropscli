@@ -74,14 +74,13 @@ vropscli getAdapterCollectionStatus 9516b17d-f2a5-4da0-ab12-c4998dc0889e
 
 # 5 - Creating new adapter instances
 
-First, setup one instance of the adapter will all settings and credentials.  Once you have confirmed that works:
-
+1. Setup one instance of the adapter will act as a template for all settings and credentials. 
 1. Determine the specific adapter and the AdapterKind from the example you created 
     ```
     vropscli getAdapters
     ```
     The Name is the second field.  Record the following info for the adapter you just created
-    * UUID (first field)
+    * UUID (1st field)
     * AdapterKind (3rd field)
 1. Generate an example CSV file based on the example you created, using the AdapterKind for step 1
     ```
