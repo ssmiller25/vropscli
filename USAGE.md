@@ -146,3 +146,28 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     ```
     vropscli updateAlertDefinitions alert.json
     ```
+
+# 8 - Create Credentials
+
+1. In to vRealize GUI, create a single credential in the management pack of your choice.  This credential will serve as a template for creating the new instances
+2. Determine the UUID of the new credentials (will be in the "id" field)
+    ```
+    vropscli getCredentials
+    ```
+3. Build out a CSV file containing the details of this credentials.  Note, no passwords will actually be exported.
+    ```
+    vropscli getCredential <UUID> > <filename>
+    ```
+    Example:
+    ```
+    vropscli getCredential f6493da5-a062-4271-a5ad-524dcf41a996 > credential.csv
+    ```
+4. Open up the CSV, and create new entries for the new credentials you wish to use.   Note any password fields will need to be populated with actual passwords.  Make sure to remove the origianl "template" entry so that it is not readded.
+5. Import the new credentials.  The output of this command will also show the UUID that can be used in #5 - Creating Adapter Instances, and #6 - Updating Adapter instances
+    ```
+    vropscli createCredentials <filename>
+    ```
+    Exmaple:
+    ```
+    vropscli createCredentials credential.csv
+    ```
