@@ -350,6 +350,66 @@ class vropscli:
             credssum[credentialInstances["id"]]={'id': credentialInstances["id"], 'name': credentialInstances["name"], 'kind': credentialInstances["adapterKindKey"]}
         return credssum
 
+    def getCredential(self, credentialId):
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId 
+        headers = {
+            'authorization': "vRealizeOpsToken " + self.token['token'],
+            'accept': "application/json",
+            }
+        response = json.loads(requests.request("GET", url, headers=headers, verify=False).text)
+        csvheader = []
+        csvrow = []
+        #csvheader.append("name")
+        #csvheader.append("description")
+        csvheader = ["name","adapterKindKey","credentialKindKey"]
+        #csvrow.append(adapterInfo["resourceKey"]["name"])
+        #csvrow.append(adapterInfo["description"])
+        csvrow.append(response["name"])
+        csvrow.append(response["adapterKindKey"])
+        csvrow.append(response["credentialKindKey"])
+
+        for credfield in response["fields"]:
+            csvheader.append(credfield["name"])
+            if "value" in credfield:
+                csvrow.append(credfield["value"])
+            else:
+                csvrow.append("")
+        print(','.join(csvheader))
+        print(','.join(map(str,csvrow)))
+
+    def createCredentials(self, credConfigFile):
+        credConfigData = open(credConfigFile, newline='')
+        credConfig = csv.DictReader(credConfigData)
+
+        for row in credConfig:
+            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
+            credConfigItems = []
+
+            for name, value in row.items():
+                if (name == 'name') or (name == 'adapterKindKey') or (name == 'credentialKindKey'): 
+                    continue
+                credConfigItems.append({"name" : name, 'value':value})
+
+            newcreddata= {
+                "name": row['name'],
+                "adapterKindKey": row['adapterKindKey'],
+                "credentialKindKey": row['credentialKindKey'],
+                "fields": credConfigItems,
+            }
+            url = 'https://' + self.config['host'] + '/suite-api/api/credentials'
+            r = requests.post(url, data=json.dumps(newcreddata), headers=clilib.get_token_header(self.token['token']), verify=False)
+            if r.status_code < 300:
+                returndata  = json.loads(r.text)
+                print(row['name'] + ' Credentail Successfully Created with ID ' + returndata["id"])
+            else:
+                print(row['name'] + ' Failed!')
+                print(str(r.status_code))
+                print(r.text)
+                print("Submitted Data")
+                print(newcreddata)
+
+    
+
     def getSolutionLicense(self, solutionId):
         '''
         Get available license
