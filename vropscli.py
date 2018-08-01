@@ -272,6 +272,10 @@ class vropscli:
 
             
     def updateAdapterInstances(self, resourceConfigFile, autostart=False):
+        resourceConfigData = open(resourceConfigFile, newline='')
+        resourceConfig = csv.DictReader(resourceConfigData)
+
+        for row in resourceConfig:
             resourceConfigItems = []
 
             for name, value in row.items():
@@ -303,7 +307,7 @@ class vropscli:
             else:
                 print(row['name'] + ' Failed!')
                 print(str(r.status_code))
-                print(r.text)        
+                print(r.text)     
         
 
 
