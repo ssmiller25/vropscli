@@ -55,7 +55,7 @@ def getConfig():
                     print("Failed to save new encryption key for " + sectionkey + " in file " + path.expanduser(configfile))
                     exit(1)
 
-        # Now read thorugh each section and add "pass" to the in-memory data structure!        
+        # Now read through each section and add "pass" to the in-memory data structure!        
         for sectionkey,section in config.items():
             config[sectionkey]["pass"] = vig(config[sectionkey]["passencrypt"],ENCODE,'d')
         return config
