@@ -8,7 +8,10 @@ default:
     pass: "password"
 
 ```
-Test by running ```vropscli getAdapters``` and verify you are getting current information back
+Test by running ```vropscli getAdapters``` and verify you are getting current information back.  Your password will
+be encoded to prevent easy copying, with a key of "passencrypt".  If you need to change the password, just delete the
+"passencrypt" line, then add the "pass" line with your new password.  On the first run of vropscli, the password
+will be re-encoded.
 
 # 2 - Install/Upgrade Management Packs
 

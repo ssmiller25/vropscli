@@ -6,23 +6,60 @@ import re
 import sys
 import time
 import json 
+import base64
 from math import ceil
-from yaml import load
+from yaml import load,dump
 from sys import exit
 from os import path
 from pathlib import Path
 
+
+ENCODE='fjciek29Dvi@Cji $icjkedCCDjd'
+
+# Vigenere ciphere for passwords in text file
+def vig(txt, key, typ='d'):
+    k_len = len(key)
+    k_ints = [ord(i) for i in key]
+    txt_ints = [ord(i) for i in txt]
+    ret_txt = ''
+    for i in range(len(txt_ints)):
+        adder = k_ints[i % k_len]
+        if typ == 'd':
+            adder *= -1
+
+        v = (txt_ints[i] - 32 + adder) % 95
+
+        ret_txt += chr(v + 32)
+
+    #print ret_txt
+    return ret_txt
+
 def getConfig():
     '''
     Function returns a yaml object of the default config file
-    File should live in '~/.vropstp.yml'
+    File should live in '~/.vropscli.yml'
     '''
     configfile=path.join(str(Path.home()), ".vropscli.yml")
     try:
         with open(path.expanduser(configfile),"r") as c:
             config = load(c)
+        # Test for encrypted password, and if not then add it.
+        for sectionkey,section in config.items():
+            if not "passencrypt" in section:
+                config[sectionkey]["passencrypt"] = vig(config[sectionkey]["pass"],ENCODE,'e')
+                del config[sectionkey]["pass"]
+                try:
+                    with open(path.expanduser(configfile),"w") as newconfig:
+                        dump(config, newconfig, default_flow_style=False)
+                except:
+                    print("Failed to save new encryption key for " + sectionkey + " in file " + path.expanduser(configfile))
+                    exit(1)
+
+        # Now read through each section and add "pass" to the in-memory data structure!        
+        for sectionkey,section in config.items():
+            config[sectionkey]["pass"] = vig(config[sectionkey]["passencrypt"],ENCODE,'d')
         return config
-    except:
+    except IOError:
         print("Failed to read config file: " + path.expanduser(configfile) )
         print("Did you copy the example file from the repo to your home directory?")
         exit(1)
@@ -37,8 +74,18 @@ def getToken(conf):
         'accept': "application/json",
         'content-type': "application/json",
         }
-    response = requests.request("POST", url, data=payload, headers=headers, verify=0)
-    return json.loads(response.text)
+    try:
+        response = requests.request("POST", url, data=payload, headers=headers, verify=0)
+        if response.status_code < 300:
+            return json.loads(response.text)
+        else:
+            print('Error authenticating to vROps system.  Check the parameters in .vropscli.yml')
+            print('Return code: ' + str(r.status_code))
+            print('Return text: ')
+            print(r.text)
+    except Exception as e:
+        print('Error authenticating to vROPs system.  Check your paramters in .vropscli.yml')
+        sys.exit(1)
 
 def get_headers():
     return {

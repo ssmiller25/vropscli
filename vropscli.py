@@ -8,6 +8,8 @@ import csv
 import sys
 
 
+VERSION="0.2.0"
+
 class vropscli:
 
     def getResource(self, resource):
@@ -585,6 +587,14 @@ class vropscli:
         #A put request to turn on the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
+
+    def version(self):
+        print("Blue Medora vROpsCLI")
+        print("Version 0.2.0")
+        print("")
+        print("For more information on Blue Medora, contact sales@bluemedora.com")
+        print("For technical assistance with this utility, contact devops@bluemedora.com")
+
 
     def __init__(self):
         requests.packages.urllib3.disable_warnings()
