@@ -513,7 +513,7 @@ class vropscli:
         #r = requests.post(url, headers=clilib.get_headers(), data=data, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         r = requests.post(url, headers=clilib.get_headers(), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
-            print('Pak installation started.  Run "vropscli.py getCurrentActivity" to get current status')
+            print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
             return True
         else:
             print('Failed to Install Pak')
