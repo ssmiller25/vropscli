@@ -40,6 +40,15 @@ class vropscli:
         for instance in response_parsed["adapterInstancesInfoDto"]:
             print(instance["id"] + "," + instance["resourceKey"]["name"] + "," + instance["resourceKey"]["adapterKindKey"])
 
+    def getCollectors(self):
+        url = "https://" + self.config['host'] + "/suite-api/api/collectors"
+
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        print("id,Name,State")
+        for instance in response_parsed["collector"]:
+            print(instance["id"] + "," + instance["name"] + "," + instance["state"])
+
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds" 
         headers = {
