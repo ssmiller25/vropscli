@@ -1,4 +1,6 @@
-# 1 - Basic Usage
+# vROpsCLI Usage - Version 1.0.0
+
+## 1 - Basic Usage
 
 First, make sure you have a .vropscli.yml file in your home directory.  It's format should be as
 ```
@@ -13,7 +15,7 @@ be encoded to prevent easy copying, with a key of "passencrypt".  If you need to
 "passencrypt" line, then add the "pass" line with your new password.  On the first run of vropscli, the password
 will be re-encoded.
 
-# 2 - Install/Upgrade Management Packs
+## 2 - Install/Upgrade Management Packs
 
 First, you will need to upload the management pack...this may take some time
 ```
@@ -28,7 +30,7 @@ You can track the current progress with
 vropscli getCurrentActivity
 ```
 
-# 3 - Install Licensing
+## 3 - Install Licensing
 
 First determine the id of the solution that was installed as part of the Management pack
 
@@ -48,7 +50,7 @@ Get current licenses installed
 vropscli getSolutionLicense OracleDatabase
 ```
 
-# 4 - Stop/Start Adapter Instances
+## 4 - Stop/Start Adapter Instances
 
 Lookup Adapter Instance UUIDs
 
@@ -75,7 +77,7 @@ vropscli getAdapterCollectionStatus 9516b17d-f2a5-4da0-ab12-c4998dc0889e
 ```
   Exit code will be 0 for successful collection, 1 for all other states
 
-# 5 - Creating new adapter instances
+## 5 - Creating new adapter instances
 
 1. Setup one instance of the adapter will act as a template for all settings and credentials. 
 1. Determine the specific adapter and the AdapterKind from the example you created 
@@ -107,7 +109,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     vropscli createAdapterInstances newadapter.csv 
     ```
 
-# 6 - Updating Existing Adapter Instances
+## 6 - Updating Existing Adapter Instances
 
 1. Identify the Adapter kind of the adapters you wish to update
     ```
@@ -136,7 +138,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     vropscli updateAdapterInstances nagios-existing.csv
     ```
 
-# 7 - Update Alert Definitions
+## 7 - Update Alert Definitions
 
 1. Identify the Adapter kind of the adapters you wish to update
     ```
@@ -160,7 +162,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     vropscli updateAlertDefinitions alert.json
     ```
 
-# 8 - Create Credentials
+## 8 - Create Credentials
 
 1. In to vRealize GUI, create a single credential in the management pack of your choice.  This credential will serve as a template for creating the new instances
 2. Determine the UUID of the new credentials (will be in the "id" field)
@@ -185,7 +187,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     vropscli createCredentials credential.csv
     ```
 
-# 9 - Delete Credentials
+## 9 - Delete Credentials
 
 1. To remove credentials that are no longer in use, first identify the ID of the credential
     ```
