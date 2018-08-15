@@ -8,7 +8,7 @@ import csv
 import sys
 
 
-VERSION="0.2.0"
+VERSION="1.0.0"
 
 class vropscli:
 
@@ -39,6 +39,15 @@ class vropscli:
         print("id,Name,Type")
         for instance in response_parsed["adapterInstancesInfoDto"]:
             print(instance["id"] + "," + instance["resourceKey"]["name"] + "," + instance["resourceKey"]["adapterKindKey"])
+
+    def getCollectors(self):
+        url = "https://" + self.config['host'] + "/suite-api/api/collectors"
+
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        print("id,Name,State")
+        for instance in response_parsed["collector"]:
+            print(instance["id"] + "," + instance["name"] + "," + instance["state"])
 
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds" 
@@ -414,7 +423,18 @@ class vropscli:
                 print("Submitted Data")
                 print(newcreddata)
 
-    
+    def deleteCredential(self, credentialId):
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId 
+        headers = {
+            'authorization': "vRealizeOpsToken " + self.token['token'],
+            'accept': "application/json",
+            }
+        r = requests.request("DELETE", url, headers=headers, verify=False)
+        if r.status_code < 300:
+            print(credentialId + " successfully deleted!")
+        else:
+            print("Error removing " + credentialId)
+            print(r.text)
 
     def getSolutionLicense(self, solutionId):
         '''
@@ -513,7 +533,7 @@ class vropscli:
         #r = requests.post(url, headers=clilib.get_headers(), data=data, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         r = requests.post(url, headers=clilib.get_headers(), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
-            print('Pak installation started.  Run "vropscli.py getCurrentActivity" to get current status')
+            print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
             return True
         else:
             print('Failed to Install Pak')
