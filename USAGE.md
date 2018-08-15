@@ -113,6 +113,12 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     ```
     vropscli getAdaptersConfigs POSTGRESQL_ADAPTER > adapter.csv
     ```
+
+1. (Opt): If you plan to update the collectors, you will want to identify the ID of the new collector with the following command
+    ```
+    vropscli getCollectors
+    ```
+
 1. If you are planning to change credentials, obtain the UUID of the new credential
     ```
     vropscli getCredentials 
