@@ -423,7 +423,18 @@ class vropscli:
                 print("Submitted Data")
                 print(newcreddata)
 
-    
+    def deleteCredential(self, credentialId):
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId 
+        headers = {
+            'authorization': "vRealizeOpsToken " + self.token['token'],
+            'accept': "application/json",
+            }
+        r = requests.request("DELETE", url, headers=headers, verify=False)
+        if r.status_code < 300:
+            print(credentialId + " successfully deleted!")
+        else:
+            print("Error removing " + credentialId)
+            print(r.text)
 
     def getSolutionLicense(self, solutionId):
         '''

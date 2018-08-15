@@ -184,3 +184,19 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     ```
     vropscli createCredentials credential.csv
     ```
+
+# 9 - Delete Credentials
+
+1. To remove credentials that are no longer in use, first identify the ID of the credential
+    ```
+    vropscli getCredentials
+    ```
+
+2. Then remove the creential with the command
+    ```
+    vropscli deleteCredential <UUID>
+    ```
+    Example:
+    ```
+    vropscli deleteCredential 00f3527f-8211-4d48-9278-cff871e3abf5
+    ```
