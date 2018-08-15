@@ -93,6 +93,10 @@ vropscli getAdapterCollectionStatus 9516b17d-f2a5-4da0-ab12-c4998dc0889e
     ```
     vropscli getCredentials 
     ```
+1. (Opt): If you plan to assign an adapter to a specific collector, you will want to identify the ID of the new collector with the following command
+    ```
+    vropscli getCollectors
+    ```
 1. Adjust the CSV file to include all the new instances based on the example you created.  The initial "example" should be
 removed from the csv.  You should leave the adapterKey blank.  Once complete, create the new instances
     ```
