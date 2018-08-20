@@ -8,7 +8,7 @@ import csv
 import sys
 
 
-VERSION="1.0.0"
+VERSION="1.0.1"
 
 class vropscli:
 
@@ -610,7 +610,7 @@ class vropscli:
 
     def version(self):
         print("Blue Medora vROpsCLI")
-        print("Version 0.2.0")
+        print("Version " + VERSION)
         print("")
         print("For more information on Blue Medora, contact sales@bluemedora.com")
         print("For technical assistance with this utility, contact devops@bluemedora.com")
