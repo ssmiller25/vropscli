@@ -579,17 +579,21 @@ class vropscli:
             print("The adapter is powered off")
             sys.exit(1)
         elif resourceState == "STARTED":
-            resourceStatus = (json.loads(resources.text)["resourceStatusStates"][0]["resourceStatus"])
-            #if the resourceStatus is DATA_RECEIVING let the user know they are collecting data
-            if resourceStatus == "DATA_RECEIVING":
-                print("The adapter is on and collecting successfully")
-                sys.exit(0)
-            elif resourceStatus == "NO_PARENT_MONITORING":
-                print("The adapter is powered off")
+            if "resourceStatus" not in json.loads(resources.text)["resourceStatusStates"][0]:
+                print("The adapter is on, but Status is BLANK")
                 sys.exit(1)
             else:
-                print("The adapter in on, but not collecting.  Status is " + resourceStatus)
-                sys.exit(1)
+                resourceStatus = (json.loads(resources.text)["resourceStatusStates"][0]["resourceStatus"])
+                #if the resourceStatus is DATA_RECEIVING let the user know they are collecting data
+                if resourceStatus == "DATA_RECEIVING":
+                    print("The adapter is on and collecting successfully")
+                    sys.exit(0)
+                elif resourceStatus == "NO_PARENT_MONITORING":
+                    print("The adapter is powered off")
+                    sys.exit(1)
+                else:
+                    print("The adapter in on, but not collecting.  Status is " + resourceStatus)
+                    sys.exit(1)
         else:
             print("Unknown adapter state: " + resourceState)
             sys.exit(1)
