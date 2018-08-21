@@ -28,8 +28,18 @@ class vropscli:
         url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterId
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
-        response_parsed = json.loads(response.text)
-        return response_parsed
+        if response.status_code < 300:
+            response_parsed = json.loads(response.text)
+            return response_parsed
+        else:
+            # Search didn't work, try to do search across all adapters
+            urlall = "https://" + self.config['host'] + "/suite-api/api/adapters"
+            r = requests.request("GET", urlall, headers=clilib.get_token_header(self.token['token']), verify=False)
+            r_parsed = json.loads(r.text)
+            for instance in r_parsed["adapterInstancesInfoDto"]:
+                if adapterId in instance["resourceKey"]["name"]:
+                    return instance
+            print("No adapter found for " + adapterId)
 
     def getAdapters(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapters"
@@ -564,9 +574,11 @@ class vropscli:
         else:
             print('Failed to Get Pak Info')
 
-    def getAdapterCollectionStatus(self, adapterID):
+    def getAdapterCollectionStatus(self, adapterId):
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + adapterID 
+        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + adapter["id"] 
         # Grab the specific adapter "resource"
         resources = requests.get(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         #filter down to the collection status
@@ -599,15 +611,19 @@ class vropscli:
             sys.exit(1)
 
     def stopAdapterInstance(self, adapterId):
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/stop'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/stop'
         #A put request to turn off the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Stopped")
 
     def startAdapterInstance(self, adapterId):
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/start'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/start'
         #A put request to turn on the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
