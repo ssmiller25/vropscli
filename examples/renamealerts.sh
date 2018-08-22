@@ -2,7 +2,7 @@
 #
 # Basic script to rename all alerts of a particular type
 export COUNT=1
-./vropscli getAlertsDefinitionsByAdapterKind HPE3PAR_ADAPTER | jq . > hpalert.json
+./vropscli getAlertsDefinitionsByAdapterKind HPE3PAR_ADAPTER | python -m json.tool > hpalert.json
 cat hpalert.json | while read line; do 
     if echo $line | grep -q name; then 
         COUNTSTR=$(printf "%03d" $COUNT)
