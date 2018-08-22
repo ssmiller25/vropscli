@@ -385,7 +385,23 @@ class vropscli:
             'authorization': "vRealizeOpsToken " + self.token['token'],
             'accept': "application/json",
             }
-        response = json.loads(requests.request("GET", url, headers=headers, verify=False).text)
+        response = requests.request("GET", url, headers=headers, verify=False)
+        if response.status_code < 300:
+            r_parsed = json.loads(response.text)
+        else:
+            # Search didn't work, try to do search across all adapters
+            urlall = "https://" + self.config['host'] + "/suite-api/api/credentials"
+            r = requests.request("GET", urlall, headers=clilib.get_token_header(self.token['token']), verify=False)
+            rall_parsed = json.loads(r.text)
+            found = False
+            for instance in rall_parsed["credentialInstances"]:
+                if credentialId in instance["name"]:
+                    r_parsed = instance
+                    found = True
+            # if we get to this point, exit entire script...nothing found
+            if found == False:
+                print("No credentail found for " + credentialId)
+                sys.exit(1)
         csvheader = []
         csvrow = []
         #csvheader.append("name")
@@ -393,11 +409,11 @@ class vropscli:
         csvheader = ["name","adapterKindKey","credentialKindKey"]
         #csvrow.append(adapterInfo["resourceKey"]["name"])
         #csvrow.append(adapterInfo["description"])
-        csvrow.append(response["name"])
-        csvrow.append(response["adapterKindKey"])
-        csvrow.append(response["credentialKindKey"])
+        csvrow.append(r_parsed["name"])
+        csvrow.append(r_parsed["adapterKindKey"])
+        csvrow.append(r_parsed["credentialKindKey"])
 
-        for credfield in response["fields"]:
+        for credfield in r_parsed["fields"]:
             csvheader.append(credfield["name"])
             if "value" in credfield:
                 csvrow.append(credfield["value"])
