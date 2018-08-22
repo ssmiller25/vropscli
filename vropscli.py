@@ -39,7 +39,9 @@ class vropscli:
             for instance in r_parsed["adapterInstancesInfoDto"]:
                 if adapterId in instance["resourceKey"]["name"]:
                     return instance
+            # if we get to this point, exit entire script...nothing found
             print("No adapter found for " + adapterId)
+            sys.exit(1)
 
     def getAdapters(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapters"
@@ -282,7 +284,9 @@ class vropscli:
 
         
     def deleteAdapterInstance(self, adapterkey):
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterkey
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"]
         r = requests.delete(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code < 300:
             print(adapterkey + ' adapter successfully deleted.')
