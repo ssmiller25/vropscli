@@ -8,7 +8,7 @@ import csv
 import sys
 
 
-VERSION="1.0.1"
+VERSION="1.1.0"
 
 class vropscli:
 
@@ -28,8 +28,20 @@ class vropscli:
         url = "https://" + self.config['host'] + "/suite-api/api/adapters/" + adapterId
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
-        response_parsed = json.loads(response.text)
-        return response_parsed
+        if response.status_code < 300:
+            response_parsed = json.loads(response.text)
+            return response_parsed
+        else:
+            # Search didn't work, try to do search across all adapters
+            urlall = "https://" + self.config['host'] + "/suite-api/api/adapters"
+            r = requests.request("GET", urlall, headers=clilib.get_token_header(self.token['token']), verify=False)
+            r_parsed = json.loads(r.text)
+            for instance in r_parsed["adapterInstancesInfoDto"]:
+                if adapterId in instance["resourceKey"]["name"]:
+                    return instance
+            # if we get to this point, exit entire script...nothing found
+            print("No adapter found for " + adapterId)
+            sys.exit(1)
 
     def getAdapters(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapters"
@@ -272,7 +284,9 @@ class vropscli:
 
         
     def deleteAdapterInstance(self, adapterkey):
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterkey
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"]
         r = requests.delete(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code < 300:
             print(adapterkey + ' adapter successfully deleted.')
@@ -371,7 +385,23 @@ class vropscli:
             'authorization': "vRealizeOpsToken " + self.token['token'],
             'accept': "application/json",
             }
-        response = json.loads(requests.request("GET", url, headers=headers, verify=False).text)
+        response = requests.request("GET", url, headers=headers, verify=False)
+        if response.status_code < 300:
+            r_parsed = json.loads(response.text)
+        else:
+            # Search didn't work, try to do search across all adapters
+            urlall = "https://" + self.config['host'] + "/suite-api/api/credentials"
+            r = requests.request("GET", urlall, headers=clilib.get_token_header(self.token['token']), verify=False)
+            rall_parsed = json.loads(r.text)
+            found = False
+            for instance in rall_parsed["credentialInstances"]:
+                if credentialId in instance["name"]:
+                    r_parsed = instance
+                    found = True
+            # if we get to this point, exit entire script...nothing found
+            if found == False:
+                print("No credentail found for " + credentialId)
+                sys.exit(1)
         csvheader = []
         csvrow = []
         #csvheader.append("name")
@@ -379,11 +409,11 @@ class vropscli:
         csvheader = ["name","adapterKindKey","credentialKindKey"]
         #csvrow.append(adapterInfo["resourceKey"]["name"])
         #csvrow.append(adapterInfo["description"])
-        csvrow.append(response["name"])
-        csvrow.append(response["adapterKindKey"])
-        csvrow.append(response["credentialKindKey"])
+        csvrow.append(r_parsed["name"])
+        csvrow.append(r_parsed["adapterKindKey"])
+        csvrow.append(r_parsed["credentialKindKey"])
 
-        for credfield in response["fields"]:
+        for credfield in r_parsed["fields"]:
             csvheader.append(credfield["name"])
             if "value" in credfield:
                 csvrow.append(credfield["value"])
@@ -564,9 +594,11 @@ class vropscli:
         else:
             print('Failed to Get Pak Info')
 
-    def getAdapterCollectionStatus(self, adapterID):
+    def getAdapterCollectionStatus(self, adapterId):
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + adapterID 
+        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + adapter["id"] 
         # Grab the specific adapter "resource"
         resources = requests.get(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         #filter down to the collection status
@@ -599,15 +631,19 @@ class vropscli:
             sys.exit(1)
 
     def stopAdapterInstance(self, adapterId):
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/stop'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/stop'
         #A put request to turn off the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Stopped")
 
     def startAdapterInstance(self, adapterId):
+        # Use adapter search
+        adapter = self.getAdapter(adapterId)
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapterId + '/monitoringstate/start'
+        url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/start'
         #A put request to turn on the adapter
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
