@@ -1,5 +1,12 @@
 # ChangeLog
 
+## v1.1.0
+
+* PR #33: Update some supporting scripts
+* PR #31: Allow usage of strings when specifing adapter instances or credential instances.  UUID are still allowed,
+          so not considered breaking.
+* PR #29: Bug with collector status if resourceStatus is BLANK
+
 ## v1.0.1
 
 * Bug #25: Version number not displayed properly
