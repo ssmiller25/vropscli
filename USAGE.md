@@ -1,4 +1,4 @@
-# vROpsCLI Usage - Version 1.0.0
+# vROpsCLI Usage - Version 1.1.0
 
 ## 1 - Basic Usage
 
