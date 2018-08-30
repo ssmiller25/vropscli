@@ -23,7 +23,7 @@ export COUNT=1
 cat oldalert.json | while read line; do 
     if echo $line | grep -q name; then 
         COUNTSTR=$(printf "%03d" $COUNT)
-        echo ${line} | sed "s/\"name\": \"/\"name\": \"VROPS_HPE_${COUNTSTR} /g"
+        echo ${line} | sed "s/\"name\": \"/\"name\": \"${PREPENDTEXT}${COUNTSTR} /g"
         COUNT=$(echo $COUNT + 1 | bc )
     else 
         echo ${line}
