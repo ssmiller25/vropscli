@@ -6,6 +6,8 @@ import pprint
 import fire
 import csv
 import sys
+import os
+import time
 
 
 VERSION="1.1.0"
@@ -62,7 +64,7 @@ class vropscli:
             print(instance["id"] + "," + instance["name"] + "," + instance["state"])
 
     def getAdapterKinds(self):
-        url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds" 
+        url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds"
         headers = {
             'authorization': "vRealizeOpsToken " + self.token['token'],
             'accept': "application/json",
@@ -84,7 +86,7 @@ class vropscli:
                 key=resource["key"]
         if key == "":
             print("No key found for " + adapterKind)
-        rsurl = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterKind + '/resourcekinds/' + key 
+        rsurl = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterKind + '/resourcekinds/' + key
         rsresponse = requests.request("GET", rsurl, headers=clilib.get_token_header(self.token['token']), verify=False)
         return(json.loads(rsresponse.text)['resourceIdentifierTypes'])
         #for resource_kinds in rs_parsed['resource-kind']:
@@ -94,7 +96,7 @@ class vropscli:
         adapterInfo = self.getAdapter(adapterId)
         settingsinfo = {}
         for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
-            settingsinfo[setting["identifierType"]["name"]]=setting["value"]    
+            settingsinfo[setting["identifierType"]["name"]]=setting["value"]
         csvheader = []
         csvrow = []
         #csvheader.append("name")
@@ -135,15 +137,15 @@ class vropscli:
             csvrow.append(adapterInfo["collectorId"])
             csvrow.append(adapterInfo["resourceKey"]["name"])
             csvrow.append(adapterInfo["description"])
-      
+
             for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
-                if (firstRun == 'true'): 
+                if (firstRun == 'true'):
                     csvheader.append(configparam["identifierType"]["name"])
                 csvrow.append(configparam["value"])
-            if (firstRun == 'true'): 
+            if (firstRun == 'true'):
                 print(','.join(csvheader))
             print(','.join(map(str, csvrow)))
-            firstRun = 'false'    
+            firstRun = 'false'
 
     def getAlertsDefinitionsByAdapterKind(self, adapterKindKey):
         url = "https://" + self.config['host'] + "/suite-api/api/alertdefinitions?adapterKind=" + adapterKindKey
@@ -217,7 +219,7 @@ class vropscli:
         else:
             print(adapterkey + ' delete failed!')
             print(str(r.status_code))
-            print(r.text)       
+            print(r.text)
 
     def deleteAlertDefinitions(self, alertConfigFile):
         with open(alertConfigFile) as jsonFile:
@@ -255,7 +257,7 @@ class vropscli:
                 "collectorId": row['collectorId'],
                 "adapterKindKey": row['adapterKind'],
                 "resourceIdentifiers": resourceConfigItems,
-                "credential": { 
+                "credential": {
                     "id": row['credentialId']
                 }
             }
@@ -282,7 +284,7 @@ class vropscli:
         for row in resourceConfig:
             self.deleteAdapterInstance(adapterkey=row['adapterkey'])
 
-        
+
     def deleteAdapterInstance(self, adapterkey):
         # Use adapter search
         adapter = self.getAdapter(adapterId)
@@ -295,7 +297,7 @@ class vropscli:
             print(str(r.status_code))
             print(r.text)
 
-            
+
     def updateAdapterInstances(self, resourceConfigFile, autostart=False):
         resourceConfigData = open(resourceConfigFile, newline='')
         resourceConfig = csv.DictReader(resourceConfigData)
@@ -332,8 +334,8 @@ class vropscli:
             else:
                 print(row['name'] + ' Failed!')
                 print(str(r.status_code))
-                print(r.text)     
-        
+                print(r.text)
+
 
 
     def getResourcesOfAdapterKind(self, adapterkey):
@@ -380,7 +382,7 @@ class vropscli:
         return credssum
 
     def getCredential(self, credentialId):
-        url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId 
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId
         headers = {
             'authorization': "vRealizeOpsToken " + self.token['token'],
             'accept': "application/json",
@@ -431,7 +433,7 @@ class vropscli:
             credConfigItems = []
 
             for name, value in row.items():
-                if (name == 'name') or (name == 'adapterKindKey') or (name == 'credentialKindKey'): 
+                if (name == 'name') or (name == 'adapterKindKey') or (name == 'credentialKindKey'):
                     continue
                 credConfigItems.append({"name" : name, 'value':value})
 
@@ -454,7 +456,7 @@ class vropscli:
                 print(newcreddata)
 
     def deleteCredential(self, credentialId):
-        url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId 
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId
         headers = {
             'authorization': "vRealizeOpsToken " + self.token['token'],
             'accept': "application/json",
@@ -570,6 +572,34 @@ class vropscli:
             print('Return code: ' + str(r.status_code))
             print(r.text)
 
+    def groupInstall(self, pakDir, overwritePak=False, force_content_update=True, verbose=False):
+        '''
+        Install all pak files found in a directory
+        Pass the full path to the directory
+        '''
+        # Get list of paks
+        paks = []
+        for (dirpath, dirnames, filenames) in os.walk(pakDir):
+            paks.extend(filenames)
+        # Upload and install each pak
+        for pak in paks:
+            full_path = pakDir + "/" + pak
+            r = self.uploadPak(full_path, overwritePak)
+            if r != None:
+                print(r)
+                self.installPak(r["pak_id"], force_content_update)
+                while True:
+                    status = self.getCurrentActivity()
+                    if verbose == True:
+                        print(status)
+                    if status["current_pak_activity"]["pak_id"] != None:
+                        print("Waiting for install to complete. . . ")
+                        time.sleep(30)
+                    else:
+                        print("Pak installed")
+                        break
+        print("Finished group install")
+
     def getPakStatus(self, pakID):
         '''
         Get Pak Installation during Upgrade
@@ -598,14 +628,14 @@ class vropscli:
         # Use adapter search
         adapter = self.getAdapter(adapterId)
         #set the url for the adapter instance
-        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + adapter["id"] 
+        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + adapter["id"]
         # Grab the specific adapter "resource"
         resources = requests.get(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         #filter down to the collection status
         #Currently grabs everything within the resourceStatusStates and needs to be filtered down to just resourceStatus
         #If the object is down let the user know
         resourceState = (json.loads(resources.text)["resourceStatusStates"][0]["resourceState"])
-       
+
         #There is the option for it to be UNKNOWN and it isn't accounted for
         if resourceState == "NOT_EXISTING" or resourceState == "STOPPED":
             print("The adapter is powered off")
