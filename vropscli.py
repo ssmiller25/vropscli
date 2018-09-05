@@ -518,14 +518,14 @@ class vropscli:
             print(str(r.status_code))
             return False
 
-    def uploadPak(self, pakFile, overwritePak=False):
+    def uploadPak(self, pakFile, overwritePak=True):
         '''
         Upload a Pak file to the server
         '''
         if overwritePak == True:
-            pak_handling_advice = 'STANDARD'
-        else:
             pak_handling_advice = 'CLOBBER'
+        else:
+            pak_handling_advice = 'STANDARD'
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/operation/upload'
         files = { 'contents': open(pakFile, 'rb') }
         data = { 'pak_handling_advice': pak_handling_advice }
