@@ -533,7 +533,6 @@ class vropscli:
         r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Upload Successful!')
-            return json.loads(r.text)
         else:
             try:
                 error_data = json.loads(r.text)
