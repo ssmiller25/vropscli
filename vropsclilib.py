@@ -5,7 +5,7 @@ import logging
 import re
 import sys
 import time
-import json 
+import json
 import base64
 from math import ceil
 from yaml import load,dump
@@ -46,8 +46,12 @@ def getConfig():
         # Test for encrypted password, and if not then add it.
         for sectionkey,section in config.items():
             if not "passencrypt" in section:
-                config[sectionkey]["passencrypt"] = vig(config[sectionkey]["pass"],ENCODE,'e')
-                del config[sectionkey]["pass"]
+                try:
+                    config[sectionkey]["passencrypt"] = vig(config[sectionkey]["pass"],ENCODE,'e')
+                    del config[sectionkey]["pass"]
+                except KeyError as e:
+                    print('vropscli could not find the key ' + str(e) + ' while reading the config file.')
+                    exit(1)
                 try:
                     with open(path.expanduser(configfile),"w") as newconfig:
                         dump(config, newconfig, default_flow_style=False)
@@ -55,7 +59,7 @@ def getConfig():
                     print("Failed to save new encryption key for " + sectionkey + " in file " + path.expanduser(configfile))
                     exit(1)
 
-        # Now read through each section and add "pass" to the in-memory data structure!        
+        # Now read through each section and add "pass" to the in-memory data structure!
         for sectionkey,section in config.items():
             config[sectionkey]["pass"] = vig(config[sectionkey]["passencrypt"],ENCODE,'d')
         return config
@@ -144,5 +148,3 @@ def wait_for_casa(host, timeout=40):
         except:
             print('Exception when trying to GET ' + url)
             return False
-
-
