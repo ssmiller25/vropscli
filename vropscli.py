@@ -539,6 +539,7 @@ class vropscli:
         r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Upload Successful!')
+            return json.loads(r.text)
         else:
             try:
                 error_data = json.loads(r.text)
@@ -547,20 +548,23 @@ class vropscli:
                 print('Failed to Install Pak')
                 print('Return code: ' + str(r.status_code))
                 print(r.text)
-                return 1
+                return None
 
             if "upgrade.pak.history_present" in error_data["error_message_key"]:
                 print('Failed to Install Pak')
                 print('Pak was already uploaded, but probably not installed')
                 print('Please finish the pak installation by calling vropscli installPak')
+                return None
             elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]: 
                 print('Failed to Install Pak')
                 print('Pak was already installed at the same or newer version')
                 print('If you wish to upgrade, please pass along --overwritePak to this function')
+                return None
             else:
                 print('Failed to Upload Pak')
                 print(str(r.status_code))
                 print(r.text)
+                return None
 
     def getPakInfo(self, pakID):
         '''
