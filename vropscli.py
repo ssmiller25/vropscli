@@ -524,14 +524,14 @@ class vropscli:
             print(str(r.status_code))
             return False
 
-    def uploadPak(self, pakFile, overwritePak=False):
+    def uploadPak(self, pakFile, overwritePak=True):
         '''
         Upload a Pak file to the server
         '''
         if overwritePak == True:
-            pak_handling_advice = 'STANDARD'
-        else:
             pak_handling_advice = 'CLOBBER'
+        else:
+            pak_handling_advice = 'STANDARD'
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/operation/upload'
         files = { 'contents': open(pakFile, 'rb') }
         data = { 'pak_handling_advice': pak_handling_advice }
@@ -541,9 +541,30 @@ class vropscli:
             print('Upload Successful!')
             return json.loads(r.text)
         else:
-            print('Failed to Upload Pak')
-            print(str(r.status_code))
-            print(r.text)
+            try:
+                error_data = json.loads(r.text)
+                print(r.text)
+            except:
+                print('Failed to Install Pak')
+                print('Return code: ' + str(r.status_code))
+                print(r.text)
+                return None
+
+            if "upgrade.pak.history_present" in error_data["error_message_key"]:
+                print('Failed to Install Pak')
+                print('Pak was already uploaded, but probably not installed')
+                print('Please finish the pak installation by calling vropscli installPak')
+                return None
+            elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]: 
+                print('Failed to Install Pak')
+                print('Pak was already installed at the same or newer version')
+                print('If you wish to upgrade, please pass along --overwritePak to this function')
+                return None
+            else:
+                print('Failed to Upload Pak')
+                print(str(r.status_code))
+                print(r.text)
+                return None
 
     def getPakInfo(self, pakID):
         '''
@@ -574,6 +595,7 @@ class vropscli:
             print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
             return True
         else:
+
             print('Failed to Install Pak')
             print('Return code: ' + str(r.status_code))
             print(r.text)
