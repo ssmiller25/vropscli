@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# vropscli: Tool for interacting with vROps API from the command line
+# Copyright (c) 2018 Blue Medora LLC
+# This work is licensed under the terms of the MIT license.
+#  For a copy, see <https://opensource.org/licenses/MIT>.
+
 import requests
 import logging
 import re
