@@ -547,6 +547,7 @@ class vropscli:
                 print('Failed to Install Pak')
                 print('Return code: ' + str(r.status_code))
                 print(r.text)
+                return 1
 
             if "upgrade.pak.history_present" in error_data["error_message_key"]:
                 print('Failed to Install Pak')
