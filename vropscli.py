@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+# vropscli: Tool for interacting with vROps API from the command line
+# Copyright (c) 2018 Blue Medora LLC
+# This work is licensed under the terms of the MIT license.  
+#  For a copy, see <https://opensource.org/licenses/MIT>. 
+
 import vropsclilib as clilib
 import requests
 import json
@@ -681,6 +687,9 @@ class vropscli:
     def version(self):
         print("Blue Medora vROpsCLI")
         print("Version " + VERSION)
+        print("Copyright (c) 2018 Blue Medora LLC")
+        print("This work is licensed under the terms of the MIT license.") 
+        print("For a copy, see <https://opensource.org/licenses/MIT>.") 
         print("")
         print("For more information on Blue Medora, contact sales@bluemedora.com")
         print("For technical assistance with this utility, contact devops@bluemedora.com")
