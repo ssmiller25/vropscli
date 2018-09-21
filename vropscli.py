@@ -587,10 +587,10 @@ class vropscli:
             content_text = 'true'
         else:
             content_text = 'false'
-        #data = { 'force_content_update': content_text }
-        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install'
-        #r = requests.post(url, headers=clilib.get_headers(), data=data, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
-        r = requests.post(url, headers=clilib.get_headers(), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        data = '{"force_content_update": ' + content_text + "}"
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install' 
+        r = requests.post(url, headers=clilib.get_headers_plain(), data=data, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        #r = requests.post(url, headers=clilib.get_headers_plain(), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
             return True
