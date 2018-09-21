@@ -18,19 +18,21 @@ fi
 ADAPTERKIND=$1
 SYNCFILE=$2
 
+echo "Processing current alerts..."
 export COUNT=1
 ./vropscli getAlertsDefinitionsByAdapterKind ${ADAPTERKIND} | python -m json.tool > oldalert.json
 cat oldalert.json | while read line; do 
     if echo $line | grep -q name; then 
 	purealertname=$(echo $line | sed 's/\"name\": \"\(.*\)\",/\1/')
 	if $(cat ${SYNCFILE} | tr ',' ' ' | grep -q -e "^${purealertname}\$"); then
-	     echo "Already renamed ${purealertname}" 1>&2
+	     #echo "Already renamed ${purealertname}" 1>&2
              echo ${line}
 	else
-	     echo "Renaming ${purealertname}" 1>&2
-             newalertname=$(cat ${SYNCFILE} | grep -e ",${purealertname}\$" | tail -n 1 | tr ',' ' ' )
+	     #echo "Renaming ${purealertname}" 1>&2
+             newalertname=$(cat ${SYNCFILE} | grep -e "${purealertname}\$" | head -n 1 | tr ',' ' ' )
              if [ -z "$newalertname" ]; then
                 echo "WARNING: \"${purealertname}\" does NOT appear in the ${SYNCFILE}.  Perhaps it needs to be added?" 1>&2
+                echo ${line}
              else
                 echo \"name\": \"${newalertname}\",
 	     fi
@@ -39,6 +41,7 @@ cat oldalert.json | while read line; do
        echo ${line}
     fi
 done  > newalert.json
-#./vropscli updateAlertDefinitions newalert.json
-#rm oldalert.json
-#rm newalert.json
+echo "Applying new alerts..."
+./vropscli updateAlertDefinitions newalert.json
+rm oldalert.json
+rm newalert.json
