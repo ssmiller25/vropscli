@@ -14,6 +14,8 @@ import csv
 import sys
 import os
 import time
+import yaml 
+from pathlib import Path
 
 
 VERSION="1.1.0"
@@ -705,6 +707,19 @@ class vropscli:
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
 
+    def saveCliCred(self):
+        '''
+        Save Credentials to a local file.
+        WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to 
+        your vROps system!!!
+        '''
+        fullconfig={'default':{'user':self.config['user'],'passencrypt':clilib.vig(self.config['pass'],clilib.ENCODE,'e'),'host':self.config['host']}}
+        configfile=os.path.join(str(Path.home()), ".vropscli.yml")
+        with open(os.path.expanduser(configfile),"w") as c:
+            yaml.dump(fullconfig, c, default_flow_style=False)
+        print(configfile + ' successfully saved!')
+        print('WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to your vROps system!!!')
+
     def version(self):
         print("Blue Medora vROpsCLI")
         print("Version " + VERSION)
@@ -716,11 +731,25 @@ class vropscli:
         print("For technical assistance with this utility, contact devops@bluemedora.com")
 
 
-    def __init__(self):
+    def __init__(self, user=None, password=None, host=None):
+        self.config = {}
         requests.packages.urllib3.disable_warnings()
-        # Just Source Config
-        self.config=clilib.getConfig()["default"]
-        self.token=clilib.getToken(self.config)
+        if user and password and host:
+            self.config['user'] = user
+            self.config['pass'] = password
+            self.config['host'] = host
+            self.token=clilib.getToken(self.config)
+        else:
+            try:
+                # Just Source Config
+                self.config=clilib.getConfig()["default"]
+                self.token=clilib.getToken(self.config)
+            except IOError:
+                print("No authentication information found!")
+                print("Use --user, --password, and --host to specify on the command line")
+                print("You may also setup a saved credential file at " + os.path.join(str(Path.home()), ".vropscli.yml"))
+                print("Please review the documentation to understand the ramifications of using a credential file")
+                exit(1)
 
 
 #scalpel=tpscalpel()

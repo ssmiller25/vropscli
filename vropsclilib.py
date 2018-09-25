@@ -45,33 +45,28 @@ def getConfig():
     File should live in '~/.vropscli.yml'
     '''
     configfile=path.join(str(Path.home()), ".vropscli.yml")
-    try:
-        with open(path.expanduser(configfile),"r") as c:
-            config = load(c)
-        # Test for encrypted password, and if not then add it.
-        for sectionkey,section in config.items():
-            if not "passencrypt" in section:
-                try:
-                    config[sectionkey]["passencrypt"] = vig(config[sectionkey]["pass"],ENCODE,'e')
-                    del config[sectionkey]["pass"]
-                except KeyError as e:
-                    print('vropscli could not find the key ' + str(e) + ' while reading the config file.')
-                    exit(1)
-                try:
-                    with open(path.expanduser(configfile),"w") as newconfig:
-                        dump(config, newconfig, default_flow_style=False)
-                except:
-                    print("Failed to save new encryption key for " + sectionkey + " in file " + path.expanduser(configfile))
-                    exit(1)
+    with open(path.expanduser(configfile),"r") as c:
+        config = load(c)
+    # Test for encrypted password, and if not then add it.
+    for sectionkey,section in config.items():
+        if not "passencrypt" in section:
+            try:
+                config[sectionkey]["passencrypt"] = vig(config[sectionkey]["pass"],ENCODE,'e')
+                del config[sectionkey]["pass"]
+            except KeyError as e:
+                print('vropscli could not find the key ' + str(e) + ' while reading the config file.')
+                exit(1)
+            try:
+                with open(path.expanduser(configfile),"w") as newconfig:
+                    dump(config, newconfig, default_flow_style=False)
+            except:
+                print("Failed to save new encryption key for " + sectionkey + " in file " + path.expanduser(configfile))
+                exit(1)
 
-        # Now read through each section and add "pass" to the in-memory data structure!
-        for sectionkey,section in config.items():
-            config[sectionkey]["pass"] = vig(config[sectionkey]["passencrypt"],ENCODE,'d')
-        return config
-    except IOError:
-        print("Failed to read config file: " + path.expanduser(configfile) )
-        print("Did you copy the example file from the repo to your home directory?")
-        exit(1)
+    # Now read through each section and add "pass" to the in-memory data structure!
+    for sectionkey,section in config.items():
+       config[sectionkey]["pass"] = vig(config[sectionkey]["passencrypt"],ENCODE,'d')
+    return config
 
 def getToken(conf):
     host=conf['host']
@@ -84,16 +79,16 @@ def getToken(conf):
         'content-type': "application/json",
         }
     try:
-        response = requests.request("POST", url, data=payload, headers=headers, verify=0)
+        response = requests.request("POST", url, data=payload, headers=headers, verify=0, timeout=10)
         if response.status_code < 300:
             return json.loads(response.text)
         else:
-            print('Error authenticating to vROps system.  Check the parameters in .vropscli.yml')
             print('Return code: ' + str(r.status_code))
             print('Return text: ')
             print(r.text)
+            sys.exit(1)
     except Exception as e:
-        print('Error authenticating to vROPs system.  Check your paramters in .vropscli.yml')
+        print('Error authenticating to vROPs system.  Check the passed hostname or parameters in .vropscli.yml')
         sys.exit(1)
 
 def get_headers():
