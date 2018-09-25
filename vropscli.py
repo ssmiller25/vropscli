@@ -238,9 +238,9 @@ class vropscli:
         url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions/' + alertDefinitionKey
         r = requests.delete(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code < 300:
-            print(adapterkey + ' alert successfully deleted.')
+            print(alertDefinitionKey + ' alert successfully deleted.')
         else:
-            print(adapterkey + ' delete failed!')
+            print(alertDefinitionKey + ' delete failed!')
             print(str(r.status_code))
             print(r.text)
 
