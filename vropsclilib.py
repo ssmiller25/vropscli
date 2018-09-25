@@ -102,6 +102,12 @@ def get_headers():
         'Accept': 'application/json;charset=UTF-8'
     }
 
+def get_headers_plain():
+    return {
+        'content-type': 'application/json',
+        'Accept': 'application/json'
+    }
+
 def get_token_header(token):
        return {
             'authorization': "vRealizeOpsToken " + token,
