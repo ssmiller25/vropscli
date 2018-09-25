@@ -583,14 +583,13 @@ class vropscli:
         '''
         Install an uploaded Pak File
         '''
+        install_data = {}
         if force_content_update == True:
-            content_text = 'true'
+            install_data['force_content_update'] = True 
         else:
-            content_text = 'false'
-        data = '{"force_content_update": ' + content_text + "}"
+            install_data['force_content_update'] = False 
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install' 
-        r = requests.post(url, headers=clilib.get_headers_plain(), data=data, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
-        #r = requests.post(url, headers=clilib.get_headers_plain(), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        r = requests.post(url, headers=clilib.get_headers_plain(), data=json.dumps(install_data), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
             return True
