@@ -9,9 +9,9 @@ First authentication will need to be setup.  For simple usage you can simply pas
 ```
 vropscli --user adminuser --password SuperSecurePass1234 --host vrops12.mydomain.com
 ```
-You may also save the credentials to a local file.  WARNING: This file should be protected with OS level permission.  
-ANYONE with this file will have credentials to your vROps system!!!  While the password is encoded to prevent simple
-reading, a sophisticated attacker could obtain this password.  To save your credentail:
+You may also save the credentials to a local file, $HOME/.vropscli.yml  WARNING: This file should be protected with OS level 
+permission.  ANYONE with this file will have credentials to your vROps system!!!  While the password is encoded to prevent 
+simple reading, a sophisticated attacker could obtain this password.  To save your credentail:
 ```
 vropscli --user adminuser --password SuperSecurePass1234 --host vrops12.mydomain.com saveCliCred
 ```

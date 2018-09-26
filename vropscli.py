@@ -709,7 +709,7 @@ class vropscli:
 
     def saveCliCred(self):
         '''
-        Save Credentials to a local file.
+        Save Credentials to a local file, $HOME/.vropscli.yml
         WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to 
         your vROps system!!!
         '''
