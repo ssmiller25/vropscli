@@ -2,18 +2,22 @@
 
 ## 1 - Basic Usage
 
-First, make sure you have a .vropscli.yml file in your home directory.  It's format should be as
-```
-default:
-    host: "vrops.domain.tld"
-    user: "admin"
-    pass: "password"
+Welcome to vROpsCLI!  This utility provides an array of functions to assist in managing your vROps system from 
+the command line.  
 
+First authentication will need to be setup.  For simple usage you can simply pass your credentials via the command line:
 ```
+vropscli --user adminuser --password SuperSecurePass1234 --host vrops12.mydomain.com
+```
+You may also save the credentials to a local file, $HOME/.vropscli.yml  WARNING: This file should be protected with OS level 
+permission.  ANYONE with this file will have credentials to your vROps system!!!  While the password is encoded to prevent 
+simple reading, a sophisticated attacker could obtain this password.  To save your credentail:
+```
+vropscli --user adminuser --password SuperSecurePass1234 --host vrops12.mydomain.com saveCliCred
+```
+
 Test by running ```vropscli getAdapters``` and verify you are getting current information back.  Your password will
-be encoded to prevent easy copying, with a key of "passencrypt".  If you need to change the password, just delete the
-"passencrypt" line, then add the "pass" line with your new password.  On the first run of vropscli, the password
-will be re-encoded.
+be encoded to prevent easy copying.  If you need to change the password, rerun the saveCliCred command above.
 
 ## 2 - Install/Upgrade Management Packs
 
