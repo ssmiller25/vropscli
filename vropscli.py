@@ -713,7 +713,13 @@ class vropscli:
         WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to 
         your vROps system!!!
         '''
-        fullconfig={'default':{'user':self.config['user'],'passencrypt':clilib.vig(self.config['pass'],clilib.ENCODE,'e'),'host':self.config['host']}}
+        fullconfig={
+            'default':{
+                'user':self.config['user'],
+                'passencrypt':clilib.vig(self.config['pass'],clilib.ENCODE,'e'),
+                'host':self.config['host']
+            }
+        }
         configfile=os.path.join(str(Path.home()), ".vropscli.yml")
         with open(os.path.expanduser(configfile),"w") as c:
             yaml.dump(fullconfig, c, default_flow_style=False)
