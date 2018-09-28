@@ -217,15 +217,20 @@ class vropscli:
             alertDefinitions = json.load(jsonFile)
 
         for alertDefinition in alertDefinitions["alertDefinitions"]:
-            self.createAlertDefinition(adapterkey=alertDefinition)
+            # Must make sure "id" does not exist for newly created alerts
+            try:
+              del alertDefinition['id']
+            except:
+              continue
+            self.createAlertDefinition(alertJSON=alertDefinition)
 
     def createAlertDefinition(self, alertJSON):
-        url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions/' + alertDefinitionKey
+        url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions'
         r = requests.post(url,  data=json.dumps(alertJSON), headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code < 300:
-            print(adapterkey + ' alert successfully deleted.')
+            print(alertJSON["name"] + ' alert successfully created.')
         else:
-            print(adapterkey + ' delete failed!')
+            print(alertJSON["name"] + ' delete failed!')
             print(str(r.status_code))
             print(r.text)
 
