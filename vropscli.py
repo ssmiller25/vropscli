@@ -234,7 +234,7 @@ class vropscli:
             alertDefinitions = json.load(jsonFile)
 
         for alertDefinition in alertDefinitions["alertDefinitions"]:
-            self.deleteAlertDefinition(adapterkey=alertDefinition['id'])
+            self.deleteAlertDefinition(alertDefinitionKey=alertDefinition['id'])
 
     def deleteAlertDefinition(self, alertDefinitionKey):
         url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions/' + alertDefinitionKey
