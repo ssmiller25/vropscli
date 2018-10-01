@@ -218,19 +218,18 @@ class vropscli:
 
         for alertDefinition in alertDefinitions["alertDefinitions"]:
             # Must make sure "id" does not exist for newly created alerts
-            try:
-              del alertDefinition['id']
-            except:
-              continue
+            if 'id' in alertDefinition:
+                del alertDefinition['id']
             self.createAlertDefinition(alertJSON=alertDefinition)
 
     def createAlertDefinition(self, alertJSON):
         url = 'https://' + self.config['host'] + '/suite-api/api/alertdefinitions'
         r = requests.post(url,  data=json.dumps(alertJSON), headers=clilib.get_token_header(self.token['token']), verify=False)
-        if r.status_code < 300:
+        if r.status_code == 201:
             print(alertJSON["name"] + ' alert successfully created.')
+            print("Return Code: " + str(r.status_code))
         else:
-            print(alertJSON["name"] + ' delete failed!')
+            print(alertJSON["name"] + ' creation failed!')
             print(str(r.status_code))
             print(r.text)
 
