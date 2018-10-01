@@ -102,8 +102,6 @@ class vropscli:
         rsurl = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterKind + '/resourcekinds/' + key
         rsresponse = requests.request("GET", rsurl, headers=clilib.get_token_header(self.token['token']), verify=False)
         return(json.loads(rsresponse.text)['resourceIdentifierTypes'])
-        #for resource_kinds in rs_parsed['resource-kind']:
-        #    print
 
     def getAdapterConfig(self, adapterId):
         '''->
@@ -119,11 +117,7 @@ class vropscli:
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]
         csvheader = []
         csvrow = []
-        #csvheader.append("name")
-        #csvheader.append("description")
         csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
-        #csvrow.append(adapterInfo["resourceKey"]["name"])
-        #csvrow.append(adapterInfo["description"])
         csvrow.append(adapterInfo["id"])
         csvrow.append(adapterInfo["resourceKey"]["adapterKindKey"])
         csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
@@ -402,12 +396,10 @@ class vropscli:
                 "collectorId": row['collectorId']
             }
 
-            #print(newadapterdata)
             url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
             r = requests.put(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
             if r.status_code < 300:
                 print(row['name'] + ' Adapter Successfully Updated - ' + str(r.status_code))
-                #print(r.text)
                 if autostart == True:
                     returndata=json.loads(r.text)
                     self.startAdapterInstance(adapterId=returndata["id"])
@@ -466,7 +458,6 @@ class vropscli:
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         credssum = {}
         response_parsed = json.loads(response.text)
-        #return(response_parsed)
         for credentialInstances in response_parsed['credentialInstances']:
             credssum[credentialInstances["id"]]={'id': credentialInstances["id"], 'name': credentialInstances["name"], 'kind': credentialInstances["adapterKindKey"]}
         return credssum
@@ -503,11 +494,7 @@ class vropscli:
                 sys.exit(1)
         csvheader = []
         csvrow = []
-        #csvheader.append("name")
-        #csvheader.append("description")
         csvheader = ["name","adapterKindKey","credentialKindKey"]
-        #csvrow.append(adapterInfo["resourceKey"]["name"])
-        #csvrow.append(adapterInfo["description"])
         csvrow.append(r_parsed["name"])
         csvrow.append(r_parsed["adapterKindKey"])
         csvrow.append(r_parsed["credentialKindKey"])
@@ -627,7 +614,6 @@ class vropscli:
             } ]
         }
 
-        #TODO: Make use a token request
         r = requests.post(url, data=json.dumps(data), headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code == 200:
             print('license key installed')
@@ -921,15 +907,6 @@ class vropscli:
                 print("Please review the documentation to understand the ramifications of using a credential file")
                 exit(1)
 
-
-#scalpel=tpscalpel()
-
-# Testing of resource routine
-#for resource in scalpel.getAllResources()["resourceList"]:
-#  print(resource["identifier"] + ", " + resource["resourceKey"]["name"] + ", " + resource["resourceKey"]["resourceKindKey"])
-
-# Pull a specific stat
-#pprint.pprint(scalpel.getAllStats("7977ad1f-0932-4178-be0b-4b900696b74a", 1484024400000, 1484255700000))
 
 if __name__ == '__main__':
   fire.Fire(vropscli)
