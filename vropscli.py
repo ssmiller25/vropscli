@@ -719,7 +719,7 @@ class vropscli:
         
         PAKDIR: The full path to the directory that contains the PAK files
         OVERWRITEPAK: Overwrite existing packs, default to false.
-        FORCE_CONTENT_UPDATE: Will overwrite included dashboards, reports, and alert definitions.  Default is true.
+        FORCE_CONTENT_UPDATE: Will overwrite included build-in dashboards, reports, and alert definitions.  Default is true.
         VERBOSE: Details output, default to false.
 
         '''
@@ -751,6 +751,8 @@ class vropscli:
 
         Get Pak Installation Status 
 
+        PAKID:  The ID of the pak file, produced when uploadPak is executed.
+
         '''
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakID + '/status'
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
@@ -779,7 +781,7 @@ class vropscli:
 
         Get Current adater collection status
 
-        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getSolution action
+        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getAdapters action
 
         '''
         # Use adapter search
@@ -822,7 +824,7 @@ class vropscli:
 
         Stop an adapter instance
 
-        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getSolution action
+        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getAdapter action
 
         '''
         # Use adapter search
@@ -838,7 +840,7 @@ class vropscli:
 
         Start an adapter instance
 
-        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getSolution action
+        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getAdapter action
 
         '''
         # Use adapter search
