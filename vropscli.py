@@ -108,7 +108,7 @@ class vropscli:
         
         Return a CSV configuration for a single adapter
 
-        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getSolution action
+        ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getAdapters action
 
         '''
         adapterInfo = self.getAdapter(adapterId)
