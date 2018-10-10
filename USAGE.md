@@ -198,7 +198,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     vropscli getCredentials
     ```
 
-2. Then remove the creential with the command
+2. Then remove the credential with the command
     ```
     vropscli deleteCredential <UUID>
     ```
