@@ -90,18 +90,59 @@ class vropscli:
         return adapterkindacc
 
     def getAdapterKindConfigParams(self, adapterKind):
+        resource = self._getAdapterInstanceKindResource(adapterKind)
+        try:
+            return(resource['resourceIdentifierTypes'])
+        except KeyError:
+            return None
+
+    def _getAdapterInstanceKindResource(self, adapterKind):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterKind + '/resourcekinds/'
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
         key = ""
         for resource in response_parsed["resource-kind"]:
             if "ADAPTER_INSTANCE" in resource["resourceKindType"]:
-                key=resource["key"]
-        if key == "":
-            print("No key found for " + adapterKind)
-        rsurl = "https://" + self.config['host'] + "/suite-api/api/adapterkinds/" + adapterKind + '/resourcekinds/' + key
-        rsresponse = requests.request("GET", rsurl, headers=clilib.get_token_header(self.token['token']), verify=False)
-        return(json.loads(rsresponse.text)['resourceIdentifierTypes'])
+                return resource
+        return None
+
+    def getAllAdapterConfigs(self):
+        '''->
+
+        Return a CSV with headers and incomplete examples for all adapter kinds
+        
+        '''
+        kinds = self.getAdapterKinds()
+        configs = [j for j in [self._getAdapterInstanceKindResource(i) for i in kinds] if j is not None and len(j["resourceIdentifierTypes"]) > 0]
+        csvs = []
+        for config in configs:
+            header = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+            sample_row = ["{leave blank}", config["adapterKind"], config["key"], "{provide credential key}", "{vROps collector id}", "{Name for instance}", "{Description of instance}"]
+            for item in config["resourceIdentifierTypes"]:
+                header.append(item["name"])
+                sample_row.append("{" + item["name"] + "}")
+            csvs.append(",".join(header) + "\n" + ",".join(sample_row))
+        return "\n\n".join(csvs)
+
+    def getAllCredentialConfigs(self):
+        '''->
+
+        Return a CSV with headers and incomplete examples for all credential kinds
+        
+        '''
+        url = "https://" + self.config['host'] + "/suite-api/api/credentialkinds/"
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        cred_types = response_parsed["credentialTypes"]
+        csvs = []
+        for ctype in cred_types:
+            header = ["adapterKindKey", "credentialKindKey", "name"]
+            sample = [ctype["adapterKindKey"], ctype["id"], "{name for credential}"]
+            for field in ctype["fields"]:
+                header.append(field["key"])
+                sample.append("{" + field["key"] + "}")
+            csvs.append(",".join(header) + "\n" + ",".join(sample))
+        return "\n\n".join(csvs)
 
     def getAdapterConfig(self, adapterId):
         '''->
@@ -137,7 +178,7 @@ class vropscli:
 
         Return a CSV configuration for all adapters of the same adapter kind
 
-        ADAPTERKINDKEY: The adatper kind key, which can get listed by calling getAdapterKinds
+        ADAPTERKINDKEY: The adapter kind key, which can get listed by calling getAdapterKinds
 
         '''
         url = "https://" + self.config['host'] + "/suite-api/api/adapters/?adapterKindKey=" + adapterKindKey
@@ -305,41 +346,43 @@ class vropscli:
 
 
         '''
-        resourceConfigData = open(resourceConfigFile, newline='')
-        resourceConfig = csv.DictReader(resourceConfigData)
+        with open(resourceConfigFile, newline='') as resourceConfigData:
+            configs = self._parseCsvTables(resourceConfigData)
+            resourceConfigs = [csv.DictReader(table) for table in configs]
 
-        for row in resourceConfig:
-            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
-            resourceConfigItems = []
+        for resourceConfig in resourceConfigs:    
+            for row in resourceConfig:
+                # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
+                resourceConfigItems = []
 
-            for name, value in row.items():
-                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
-                    continue
-                resourceConfigItems.append({"name" : name, 'value':value})
+                for name, value in row.items():
+                    if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
+                        continue
+                    resourceConfigItems.append({"name" : name, 'value':value})
 
-            newadapterdata= {
-                "name": row['name'],
-                "description": row['description'],
-                "collectorId": row['collectorId'],
-                "adapterKindKey": row['adapterKind'],
-                "resourceIdentifiers": resourceConfigItems,
-                "credential": {
-                    "id": row['credentialId']
+                newadapterdata= {
+                    "name": row['name'],
+                    "description": row['description'],
+                    "collectorId": row['collectorId'],
+                    "adapterKindKey": row['adapterKind'],
+                    "resourceIdentifiers": resourceConfigItems,
+                    "credential": {
+                        "id": row['credentialId']
+                    }
                 }
-            }
-            url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
-            r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
-            if r.status_code < 300:
-                print(row['name'] + ' Adapter Successfully Installed')
-                if autostart == True:
-                    returndata=json.loads(r.text)
-                    self.startAdapterInstance(adapterId=returndata["id"])
-            else:
-                print(row['name'] + ' Failed!')
-                print(str(r.status_code))
-                print(r.text)
-                print("Submitted Data")
-                print(newadapterdata)
+                url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
+                r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
+                if r.status_code < 300:
+                    print(row['name'] + ' Adapter Successfully Installed')
+                    if autostart == True:
+                        returndata=json.loads(r.text)
+                        self.startAdapterInstance(adapterId=returndata["id"])
+                else:
+                    print(row['name'] + ' Failed!')
+                    print(str(r.status_code))
+                    print(r.text)
+                    print("Submitted Data")
+                    print(newadapterdata)
 
 
     def deleteAdapterInstances(self, resourceConfigFile):
@@ -508,6 +551,20 @@ class vropscli:
         print(','.join(csvheader))
         print(','.join(map(str,csvrow)))
 
+    def _parseCsvTables(self, csv_file):
+        tables = []
+        table = []
+        for line in csv_file:
+            if line == "\n":
+                if len(table):
+                    tables.append(table)
+                    table = []
+            else:
+                table.append(line)
+        if len(table):
+            tables.append(table)
+        return tables            
+
     def createCredentials(self, credConfigFile):
         '''->
 
@@ -516,35 +573,37 @@ class vropscli:
         CREDCONFIGFILE: Credentail CSV file (with passwords added by user)
 
         '''
-        credConfigData = open(credConfigFile, newline='')
-        credConfig = csv.DictReader(credConfigData)
+        with open(credConfigFile, newline='') as credConfigData:
+            configs = self._parseCsvTables(credConfigData)
+            credConfigs = [csv.DictReader(table) for table in configs]
 
-        for row in credConfig:
-            # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
-            credConfigItems = []
+        for credConfig in credConfigs:    
+            for row in credConfig:
+                # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
+                credConfigItems = []
 
-            for name, value in row.items():
-                if (name == 'name') or (name == 'adapterKindKey') or (name == 'credentialKindKey'):
-                    continue
-                credConfigItems.append({"name" : name, 'value':value})
+                for name, value in row.items():
+                    if (name == 'name') or (name == 'adapterKindKey') or (name == 'credentialKindKey'):
+                        continue
+                    credConfigItems.append({"name" : name, 'value':value})
 
-            newcreddata= {
-                "name": row['name'],
-                "adapterKindKey": row['adapterKindKey'],
-                "credentialKindKey": row['credentialKindKey'],
-                "fields": credConfigItems,
-            }
-            url = 'https://' + self.config['host'] + '/suite-api/api/credentials'
-            r = requests.post(url, data=json.dumps(newcreddata), headers=clilib.get_token_header(self.token['token']), verify=False)
-            if r.status_code < 300:
-                returndata  = json.loads(r.text)
-                print(row['name'] + ' Credentail Successfully Created with ID ' + returndata["id"])
-            else:
-                print(row['name'] + ' Failed!')
-                print(str(r.status_code))
-                print(r.text)
-                print("Submitted Data")
-                print(newcreddata)
+                newcreddata= {
+                    "name": row['name'],
+                    "adapterKindKey": row['adapterKindKey'],
+                    "credentialKindKey": row['credentialKindKey'],
+                    "fields": credConfigItems,
+                }
+                url = 'https://' + self.config['host'] + '/suite-api/api/credentials'
+                r = requests.post(url, data=json.dumps(newcreddata), headers=clilib.get_token_header(self.token['token']), verify=False)
+                if r.status_code < 300:
+                    returndata  = json.loads(r.text)
+                    print(row['name'] + ' Credentail Successfully Created with ID ' + returndata["id"])
+                else:
+                    print(row['name'] + ' Failed!')
+                    print(str(r.status_code))
+                    print(r.text)
+                    print("Submitted Data")
+                    print(newcreddata)
 
     def deleteCredential(self, credentialId):
         '''->
