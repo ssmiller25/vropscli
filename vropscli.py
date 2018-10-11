@@ -387,7 +387,7 @@ class vropscli:
 
     def deleteAdapterInstances(self, resourceConfigFile):
 
-        with open(resourceConfigFile, newline='') as resourceConfig:
+        with open(resourceConfigFile, newline='') as resourceConfigData:
             resourceConfig = csv.DictReader(resourceConfigData)
 
         for row in resourceConfig:
@@ -416,8 +416,8 @@ class vropscli:
         AUTOSTART:  If the adapters should be started after update.  Defaults to false.
 
         '''
-        resourceConfigData = open(resourceConfigFile, newline='')
-        resourceConfig = csv.DictReader(resourceConfigData)
+        with open(resourceConfigFile, newline='') as resourceConfigData:
+            resourceConfig = csv.DictReader(resourceConfigData)
 
         for row in resourceConfig:
             resourceConfigItems = []
@@ -696,38 +696,39 @@ class vropscli:
         else:
             pak_handling_advice = 'STANDARD'
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/operation/upload'
-        files = { 'contents': open(pakFile, 'rb') }
-        data = { 'pak_handling_advice': pak_handling_advice }
-        print("Started Pak Upload: " + str(pakFile) + ".  This may take a while")
-        r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
-        if r.status_code < 300:
-            print('Upload Successful!')
-            return json.loads(r.text)
-        else:
-            try:
-                error_data = json.loads(r.text)
-                print(r.text)
-            except:
-                print('Failed to Install Pak')
-                print('Return code: ' + str(r.status_code))
-                print(r.text)
-                return None
-
-            if "upgrade.pak.history_present" in error_data["error_message_key"]:
-                print('Failed to Install Pak')
-                print('Pak was already uploaded, but probably not installed')
-                print('Please finish the pak installation by calling vropscli installPak')
-                return None
-            elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]: 
-                print('Failed to Install Pak')
-                print('Pak was already installed at the same or newer version')
-                print('If you wish to upgrade, please pass along --overwritePak to this function')
-                return None
+        with open(pakFile, 'rb') as pf:
+            files = { 'contents': pf }
+            data = { 'pak_handling_advice': pak_handling_advice }
+            print("Started Pak Upload: " + str(pakFile) + ".  This may take a while")
+            r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+            if r.status_code < 300:
+                print('Upload Successful!')
+                return json.loads(r.text)
             else:
-                print('Failed to Upload Pak')
-                print(str(r.status_code))
-                print(r.text)
-                return None
+                try:
+                    error_data = json.loads(r.text)
+                    print(r.text)
+                except:
+                    print('Failed to Install Pak')
+                    print('Return code: ' + str(r.status_code))
+                    print(r.text)
+                    return None
+
+                if "upgrade.pak.history_present" in error_data["error_message_key"]:
+                    print('Failed to Install Pak')
+                    print('Pak was already uploaded, but probably not installed')
+                    print('Please finish the pak installation by calling vropscli installPak')
+                    return None
+                elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]: 
+                    print('Failed to Install Pak')
+                    print('Pak was already installed at the same or newer version')
+                    print('If you wish to upgrade, please pass along --overwritePak to this function')
+                    return None
+                else:
+                    print('Failed to Upload Pak')
+                    print(str(r.status_code))
+                    print(r.text)
+                    return None
 
     def getPakInfo(self, pakID):
         '''->
