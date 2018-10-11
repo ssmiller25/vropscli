@@ -387,8 +387,8 @@ class vropscli:
 
     def deleteAdapterInstances(self, resourceConfigFile):
 
-        resourceConfigData = open(resourceConfigFile, newline='')
-        resourceConfig = csv.DictReader(resourceConfigData)
+        with open(resourceConfigFile, newline='') as resourceConfig:
+            resourceConfig = csv.DictReader(resourceConfigData)
 
         for row in resourceConfig:
             self.deleteAdapterInstance(adapterkey=row['adapterkey'])
