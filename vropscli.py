@@ -116,8 +116,8 @@ class vropscli:
         configs = [j for j in [self._getAdapterInstanceKindResource(i) for i in kinds] if j is not None and len(j["resourceIdentifierTypes"]) > 0]
         csvs = []
         for config in configs:
-            header = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
-            sample_row = ["{leave blank}", config["adapterKind"], config["key"], "{provide credential key}", "{vROps collector id}", "{Name for instance}", "{Description of instance}"]
+            header = ["adapterKind","resourceKind","credentialName","collectorId","name","description"]
+            sample_row = [config["adapterKind"], config["key"], "{name of existing credential}", "{vROps collector id}", "{Name for instance}", "{Description of instance}"]
             for item in config["resourceIdentifierTypes"]:
                 header.append(item["name"])
                 sample_row.append("{" + item["name"] + "}")
@@ -349,11 +349,21 @@ class vropscli:
         with open(resourceConfigFile, newline='') as resourceConfigData:
             configs = self._parseCsvTables(resourceConfigData)
             resourceConfigs = [csv.DictReader(table) for table in configs]
-
+        credentials = self._getCredentialsRaw()
         for resourceConfig in resourceConfigs:    
             for row in resourceConfig:
                 # Suite-API specifically expects a list of dictionary objects, with only two ides of "name" and "value".  Not even asking why...
                 resourceConfigItems = []
+                try:
+                    credentialName = row.pop("credentialName")
+                    try:
+                        row["credentialId"] = next(i["id"] for i in credentials if i["name"] == credentialName and i["adapterKindKey"] == row["adapterKind"])
+                    except:
+                        print(row['name'] + 'Failed!')
+                        print(f"Credential name {credentialName} not found")
+                        continue
+                except KeyError:
+                    pass
 
                 for name, value in row.items():
                     if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
@@ -496,14 +506,20 @@ class vropscli:
         Return all credentials defined in the vROps system
 
         '''
-        url = "https://" + self.config['host'] + "/suite-api/api/credentials"
+        # url = "https://" + self.config['host'] + "/suite-api/api/credentials"
 
-        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        # response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        # 
+        # response_parsed = json.loads(response.text)
         credssum = {}
-        response_parsed = json.loads(response.text)
-        for credentialInstances in response_parsed['credentialInstances']:
+        for credentialInstances in self._getCredentialsRaw():
             credssum[credentialInstances["id"]]={'id': credentialInstances["id"], 'name': credentialInstances["name"], 'kind': credentialInstances["adapterKindKey"]}
         return credssum
+
+    def _getCredentialsRaw(self):
+        url = "https://" + self.config['host'] + "/suite-api/api/credentials"
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        return json.loads(response.text)['credentialInstances']
 
     def getCredential(self, credentialId):
         '''->
@@ -555,14 +571,15 @@ class vropscli:
         tables = []
         table = []
         for line in csv_file:
-            if line == "\n":
+            if line.strip() == "":
                 if len(table):
                     tables.append(table)
                     table = []
             else:
-                table.append(line)
+                table.append(line.strip())
         if len(table):
             tables.append(table)
+        print(tables)
         return tables            
 
     def createCredentials(self, credConfigFile):
