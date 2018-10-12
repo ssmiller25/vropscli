@@ -353,7 +353,7 @@ class vropscli:
 
     def deleteAdapterInstance(self, adapterkey):
         # Use adapter search
-        adapter = self.getAdapter(adapterId)
+        adapter = self.getAdapter(adapterkey)
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"]
         r = requests.delete(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         if r.status_code < 300:
