@@ -579,7 +579,6 @@ class vropscli:
                 table.append(line.strip())
         if len(table):
             tables.append(table)
-        print(tables)
         return tables            
 
     def createCredentials(self, credConfigFile):
