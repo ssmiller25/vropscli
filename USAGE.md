@@ -19,6 +19,9 @@ vropscli --user adminuser --password SuperSecurePass1234 --host vrops12.mydomain
 Test by running ```vropscli getAdapters``` and verify you are getting current information back.  Your password will
 be encoded to prevent easy copying.  If you need to change the password, rerun the saveCliCred command above.
 
+*Note:* vROpsCLI assumes you vROps system is fully booting up and the cluster is fully online.  Undefined behavior will result
+if using this utility against a system that is not fully started.
+
 ## 2 - Install/Upgrade Management Packs
 
 First, you will need to upload the management pack...this may take some time
