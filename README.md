@@ -10,7 +10,11 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 # Development Environment Setup
 
-* Run ```pipenv --python 3.6``` In current directory
+* Make sure to have Python and Pipenv install
+** For Mac, Install Homebrew (this may take a while if Xcode needs to be installed):
+```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
+** ```brew install pipenv```
+* Run ```pipenv --python 3.7``` In current directory
 * Run ```pipenv update``` to ensure everything is up to date
 
 ## To Use
