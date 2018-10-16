@@ -892,7 +892,7 @@ class vropscli:
                 print("You may also setup a saved credential file at " + os.path.join(str(Path.home()), ".vropscli.yml") + " by running the following:")
                 print("    vropscli --user <username> --password <password> --host <host> saveCliCred")
                 print("Please review the documentation to understand the ramifications of using a credential file")
-                exit(1)
+                sys.exit(1)
 
 
 if __name__ == '__main__':
