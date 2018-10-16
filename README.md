@@ -19,6 +19,7 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 ## To Distribute
 
+* If you wish to compile to work natively on a vROps system (SLES 11), follow the direction in [vropsbuild.md](vropsbuild.md)
 * On "target" platofrm (Windows, Mac, etc), run:
 ```
 pipenv install pyinstaller

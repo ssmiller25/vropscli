@@ -49,7 +49,7 @@ make install
 
 
 
-# Ral Python
+# Real Python
 cd Python-3.6.1/
 ./configure --prefix=/usr/local --exec-prefix=/usr/local
 make
