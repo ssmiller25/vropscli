@@ -23,7 +23,8 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 ## To Distribute
 
-* On "target" platofrm (Windows, Mac, etc), run:
+Make sure to compile this on the *oldest* OS you wish to support with your binary!
+* On "target" platform (Windows, Mac, etc), run:
 ```
 pipenv install pyinstaller
 pyinstaller -F vropscli.py
