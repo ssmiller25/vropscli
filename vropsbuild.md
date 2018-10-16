@@ -8,13 +8,16 @@ sudo zypper install gcc gcc-c++ make ncurses patch zlib-devel wget tar xz awk ne
 sudo zypper install git
 
 # Openssl
+* Download OpenSSL from https://github.com/openssl/openssl/releases (tar.gz) and scp to vrops system
 cd openssl/
 ./config --prefix=/usr --openssldir=/usr/local/openssl shared
 make
 make install
 
 
-# Curl
+# Curl (Against OpneSSL libs, above)
+* Download from https://github.com/curl/curl/releases (tar.gz) and scp to vrops system
+tar -xzvf curl-*.tar.gz
 cd curl/
 ./buildconf
 ./configure --prefix=/usr/local --with-ssl --disable-shared
