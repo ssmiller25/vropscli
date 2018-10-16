@@ -889,7 +889,7 @@ class vropscli:
             except IOError:
                 print("No authentication information found!")
                 print("Use --user, --password, and --host to specify on the command line")
-                print("You may also setup a saved credential file at " + os.path.join(str(Path.home()), ".vropscli.yml") + "by running the following:")
+                print("You may also setup a saved credential file at " + os.path.join(str(Path.home()), ".vropscli.yml") + " by running the following:")
                 print("    vropscli --user <username> --password <password> --host <host> saveCliCred")
                 print("Please review the documentation to understand the ramifications of using a credential file")
                 exit(1)
