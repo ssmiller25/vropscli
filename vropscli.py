@@ -639,7 +639,7 @@ class vropscli:
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/operation/upload'
         files = { 'contents': open(pakFile, 'rb') }
         data = { 'pak_handling_advice': pak_handling_advice }
-        print("Started Pak Upload: " + str(pakFile) + ".  This may take a while")
+        print("Started Pak Upload: " + str(pakFile) + ".  This may take up to 20 minutes depending on network speed.")
         r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Upload Successful!')
