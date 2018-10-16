@@ -335,6 +335,7 @@ class vropscli:
                     returndata=json.loads(r.text)
                     self.startAdapterInstance(adapterId=returndata["id"])
             else:
+                r.raise_for_status()
                 print(row['name'] + ' Failed!')
                 print(str(r.status_code))
                 print(r.text)
@@ -911,4 +912,9 @@ class vropscli:
 
 
 if __name__ == '__main__':
-  fire.Fire(vropscli)
+  try:
+    fire.Fire(vropscli)
+  except Exception as e:
+    print("Error: " + str(e))
+    
+  
