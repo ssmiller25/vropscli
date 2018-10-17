@@ -447,7 +447,7 @@ class vropscli:
             print(str(r.status_code))
             return False
 
-    def getCredentials(self):
+    def getAllCredentials(self):
         '''->
        
         Return all credentials defined in the vROps system
@@ -458,9 +458,9 @@ class vropscli:
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         credssum = {}
         response_parsed = json.loads(response.text)
+        print("id,name,adapterKind")
         for credentialInstances in response_parsed['credentialInstances']:
-            credssum[credentialInstances["id"]]={'id': credentialInstances["id"], 'name': credentialInstances["name"], 'kind': credentialInstances["adapterKindKey"]}
-        return credssum
+            print(credentialInstances["id"] + "," + credentialInstances["name"] + "," + credentialInstances["adapterKindKey"])
 
     def getCredential(self, credentialId):
         '''->
@@ -490,7 +490,7 @@ class vropscli:
                     found = True
             # if we get to this point, exit entire script...nothing found
             if found == False:
-                print("No credentail found for " + credentialId)
+                print("No credential found for " + credentialId)
                 sys.exit(1)
         csvheader = []
         csvrow = []
@@ -551,7 +551,7 @@ class vropscli:
 
         Delete an individual credential
 
-        CREDENTIALID: The ID of the specific credential to delete.  This can get obtained from the getCredentials function.
+        CREDENTIALID: The ID of the specific credential to delete.  This can get obtained from the getAllCredentials function.
 
         '''
         url = "https://" + self.config['host'] + "/suite-api/api/credentials/" + credentialId
@@ -641,7 +641,7 @@ class vropscli:
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/operation/upload'
         files = { 'contents': open(pakFile, 'rb') }
         data = { 'pak_handling_advice': pak_handling_advice }
-        print("Started Pak Upload: " + str(pakFile) + ".  This may take a while")
+        print("Started Pak Upload: " + str(pakFile) + ".  This may take up to 20 minutes depending on network speed.")
         r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Upload Successful!')
