@@ -118,21 +118,23 @@ class vropscli:
         for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
             settingsinfo[setting["identifierType"]["name"]]=setting["value"]
         csvheader = []
-        csvrow = []
+        csvrow = {}
         csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
-        csvrow.append(adapterInfo["id"])
-        csvrow.append(adapterInfo["resourceKey"]["adapterKindKey"])
-        csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
-        csvrow.append(adapterInfo["credentialInstanceId"])
-        csvrow.append(adapterInfo["collectorId"])
-        csvrow.append(adapterInfo["resourceKey"]["name"])
-        csvrow.append(adapterInfo["description"])
+        csvrow["adapterkey"]=adapterInfo["id"]
+        csvrow["adapterKind"]=adapterInfo["resourceKey"]["adapterKindKey"]
+        csvrow["resourceKind"]=adapterInfo["resourceKey"]["resourceKindKey"]
+        csvrow["credentialId"]=adapterInfo["credentialInstanceId"]
+        csvrow["collectorId"]=adapterInfo["collectorId"]
+        csvrow["name"]=adapterInfo["resourceKey"]["name"]
+        csvrow["description"]=adapterInfo["description"]
 
         for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
             csvheader.append(configparam["identifierType"]["name"])
-            csvrow.append(configparam["value"])
-        print(','.join(csvheader))
-        print(','.join(map(str,csvrow)))
+            csvrow[configparam["identifierType"]["name"]]=configparam["value"]
+        csvwr = csv.DictWriter(sys.stdout, fieldnames=csvheader, quoting=csv.QUOTE_ALL)
+        csvwr.writeheader()
+        csvwr.writerow(csvrow)
+
 
     def getAdapterConfigs(self, adapterKindKey):
         '''->
@@ -152,22 +154,23 @@ class vropscli:
         response_parsed = json.loads(response.text)
 
         for adapterInfo in response_parsed["adapterInstancesInfoDto"]:
-            csvrow = []
-            csvrow.append(adapterInfo["id"])
-            csvrow.append(adapterKindKey)
-            csvrow.append(adapterInfo["resourceKey"]["resourceKindKey"])
-            csvrow.append(adapterInfo["credentialInstanceId"])
-            csvrow.append(adapterInfo["collectorId"])
-            csvrow.append(adapterInfo["resourceKey"]["name"])
-            csvrow.append(adapterInfo["description"])
+            csvrow = {}
+            csvrow["adapterkey"]=adapterInfo["id"]
+            csvrow["adapterKind"]=adapterInfo["resourceKey"]["adapterKindKey"]
+            csvrow["resourceKind"]=adapterInfo["resourceKey"]["resourceKindKey"]
+            csvrow["credentialId"]=adapterInfo["credentialInstanceId"]
+            csvrow["collectorId"]=adapterInfo["collectorId"]
+            csvrow["name"]=adapterInfo["resourceKey"]["name"]
+            csvrow["description"]=adapterInfo["description"]
 
             for configparam in adapterInfo["resourceKey"]["resourceIdentifiers"]:
                 if (firstRun == 'true'):
                     csvheader.append(configparam["identifierType"]["name"])
-                csvrow.append(configparam["value"])
+                csvrow[configparam["identifierType"]["name"]]=configparam["value"]
             if (firstRun == 'true'):
-                print(','.join(csvheader))
-            print(','.join(map(str, csvrow)))
+                csvwr = csv.DictWriter(sys.stdout, fieldnames=csvheader, quoting=csv.QUOTE_ALL)
+                csvwr.writeheader()
+            csvwr.writerow(csvrow)
             firstRun = 'false'
 
     def getAlertsDefinitionsByAdapterKind(self, adapterKindKey):
@@ -452,9 +455,20 @@ class vropscli:
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         credssum = {}
         response_parsed = json.loads(response.text)
-        print("id,name,adapterKind")
+        csvheader=[]
+        csvrows=[]
+        csvheader = ["id","name","adapterKind"]
+
         for credentialInstances in response_parsed['credentialInstances']:
-            print(credentialInstances["id"] + "," + credentialInstances["name"] + "," + credentialInstances["adapterKindKey"])
+            arow = {}
+            arow["id"]=credentialInstances["id"]
+            arow["name"]=credentialInstances["name"]
+            arow["adapterKind"]=credentialInstances["adapterKindKey"]
+            csvrows.append(arow)
+        csvwr = csv.DictWriter(sys.stdout, fieldnames=csvheader, quoting=csv.QUOTE_ALL)
+        csvwr.writeheader()
+        for row in csvrows:
+            csvwr.writerow(row)
 
     def getCredential(self, credentialId):
         '''->
@@ -487,20 +501,19 @@ class vropscli:
                 print("No credential found for " + credentialId)
                 sys.exit(1)
         csvheader = []
-        csvrow = []
+        csvrow = {}
         csvheader = ["name","adapterKindKey","credentialKindKey"]
-        csvrow.append(r_parsed["name"])
-        csvrow.append(r_parsed["adapterKindKey"])
-        csvrow.append(r_parsed["credentialKindKey"])
+        csvrow["name"]=r_parsed["name"]
+        csvrow["adapterKindKey"]=r_parsed["adapterKindKey"]
+        csvrow["credentialKindKey"]=r_parsed["credentialKindKey"]
 
         for credfield in r_parsed["fields"]:
             csvheader.append(credfield["name"])
             if "value" in credfield:
-                csvrow.append(credfield["value"])
-            else:
-                csvrow.append("")
-        print(','.join(csvheader))
-        print(','.join(map(str,csvrow)))
+                csvrow[credfield["name"]]=credfield["value"]
+        csvwr=csv.DictWriter(sys.stdout, fieldnames=csvheader, quoting=csv.QUOTE_ALL)
+        csvwr.writeheader()
+        csvwr.writerow(csvrow)
 
     def createCredentials(self, credConfigFile):
         '''->
