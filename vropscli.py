@@ -584,7 +584,9 @@ class vropscli:
         '''
         url = 'https://' + self.config['host'] + '/suite-api/api/solutions'
         r = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
-        return json.loads(r.text)
+        print("id,name,version,adapterKind")
+        for solution in json.loads(r.text)["solution"]:
+            print(solution["id"] + "," + solution["name"] + "," + str(solution["version"])  + "," + solution["adapterKindKeys"][0])
 
     def getVropsLicense(self):
         '''->
