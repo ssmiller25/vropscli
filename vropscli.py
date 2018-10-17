@@ -15,6 +15,8 @@ import sys
 import os
 import time
 import yaml 
+import traceback
+#from urllib3.exceptions import HTTPError
 from pathlib import Path
 
 
@@ -51,7 +53,7 @@ class vropscli:
                     return instance
             # if we get to this point, exit entire script...nothing found
             print("No adapter found for " + adapterId)
-            sys.exit(1)
+            r.raise_for_status()
 
     def getAdapters(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapters"
@@ -202,11 +204,10 @@ class vropscli:
             if r.status_code < 300:
                 print(alertDefinition["name"] + ' updated successfully.')
             else:
-                print(alertDefinition["name"]  + ' update failed!')
-                print(str(r.status_code))
-                print(r.text)
-                print("Submitted Data")
-                print(json.dumps(alertDefinition))
+                # Print error, but continue processing
+                print(alertDefinition["name"] + ' updated failed!.')
+                print(r.text())
+
 
     def generateAlertTemplate(self):
         newAlertData= {"alertDefinitions":[
@@ -291,9 +292,7 @@ class vropscli:
         if r.status_code < 300:
             print(alertDefinitionKey + ' alert successfully deleted.')
         else:
-            print(alertDefinitionKey + ' delete failed!')
-            print(str(r.status_code))
-            print(r.text)
+            r.raise_for_status()
 
     def createAdapterInstances(self, resourceConfigFile, autostart=False):
         '''->
@@ -335,11 +334,7 @@ class vropscli:
                     returndata=json.loads(r.text)
                     self.startAdapterInstance(adapterId=returndata["id"])
             else:
-                print(row['name'] + ' Failed!')
-                print(str(r.status_code))
-                print(r.text)
-                print("Submitted Data")
-                print(newadapterdata)
+                r.raise_for_status()
 
 
     def deleteAdapterInstances(self, resourceConfigFile):
@@ -359,9 +354,7 @@ class vropscli:
         if r.status_code < 300:
             print(adapterkey + ' adapter successfully deleted.')
         else:
-            print(adapterkey + ' delete failed!')
-            print(str(r.status_code))
-            print(r.text)
+            r.raise_for_status()
 
 
     def updateAdapterInstances(self, resourceConfigFile, autostart=False):
@@ -404,6 +397,7 @@ class vropscli:
                     returndata=json.loads(r.text)
                     self.startAdapterInstance(adapterId=returndata["id"])
             else:
+                #Not Raising excpetion as we want to continue processing the file
                 print(row['name'] + ' Failed!')
                 print(str(r.status_code))
                 print(r.text)
@@ -540,11 +534,10 @@ class vropscli:
                 returndata  = json.loads(r.text)
                 print(row['name'] + ' Credentail Successfully Created with ID ' + returndata["id"])
             else:
+                # Not raising exception as we want to process the entire file, if possible
                 print(row['name'] + ' Failed!')
                 print(str(r.status_code))
                 print(r.text)
-                print("Submitted Data")
-                print(newcreddata)
 
     def deleteCredential(self, credentialId):
         '''->
@@ -563,8 +556,7 @@ class vropscli:
         if r.status_code < 300:
             print(credentialId + " successfully deleted!")
         else:
-            print("Error removing " + credentialId)
-            print(r.text)
+            r.raise_for_status()
 
     def getSolutionLicense(self, solutionId):
         '''->
@@ -652,9 +644,7 @@ class vropscli:
                 print(r.text)
             except:
                 print('Failed to Install Pak')
-                print('Return code: ' + str(r.status_code))
-                print(r.text)
-                return None
+                r.raise_for_status()
 
             if "upgrade.pak.history_present" in error_data["error_message_key"]:
                 print('Failed to Install Pak')
@@ -667,10 +657,7 @@ class vropscli:
                 print('If you wish to upgrade, please pass along --overwritePak to this function')
                 return None
             else:
-                print('Failed to Upload Pak')
-                print(str(r.status_code))
-                print(r.text)
-                return None
+                r.raise_for_status()
 
     def getPakInfo(self, pakID):
         '''->
@@ -686,8 +673,7 @@ class vropscli:
             return json.loads(r.text)
             return True
         else:
-            print('Failed to Get Pak Info')
-            print(str(r.status_code))
+            r.raise_for_status()
 
     def installPak(self, pakId, force_content_update=True):
         '''->
@@ -709,10 +695,8 @@ class vropscli:
             print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
             return True
         else:
+            r.raise_for_status()
 
-            print('Failed to Install Pak')
-            print('Return code: ' + str(r.status_code))
-            print(r.text)
 
     def groupInstall(self, pakDir, overwritePak=False, force_content_update=True, verbose=False):
         '''->
@@ -763,6 +747,7 @@ class vropscli:
             return True
         else:
             print('Failed to Get Pak Info')
+            r.raise_for_status()
 
     def getCurrentActivity(self):
         '''->
@@ -776,7 +761,7 @@ class vropscli:
             return json.loads(r.text)
             return True
         else:
-            print('Failed to Get Pak Info')
+            r.raise_for_status()
 
     def getAdapterCollectionStatus(self, adapterId):
         '''->
@@ -906,11 +891,33 @@ class vropscli:
             except IOError:
                 print("No authentication information found!")
                 print("Use --user, --password, and --host to specify on the command line")
-                print("You may also setup a saved credential file at " + os.path.join(str(Path.home()), ".vropscli.yml") + "by running the following:")
+                print("You may also setup a saved credential file at " + os.path.join(str(Path.home()), ".vropscli.yml") + " by running the following:")
                 print("    vropscli --user <username> --password <password> --host <host> saveCliCred")
                 print("Please review the documentation to understand the ramifications of using a credential file")
-                exit(1)
+                sys.exit(1)
 
 
 if __name__ == '__main__':
-  fire.Fire(vropscli)
+  # Using simplistic argument parsing to avoid conflicts with Fire (and currently only used for debug messages
+  verbose=False
+  for arg in sys.argv:
+      if arg == "-v":
+          verbose=True
+  try:
+    fire.Fire(vropscli)
+  except requests.exceptions.HTTPError as e:
+    if verbose==True:
+        print("Error: " + str(e))
+        print("Returned data: " + e.response.text)
+    else:
+        print("Error: " + str(e))
+        print("Pass the -v flag for more verbose error messages")
+  except Exception as e:
+    if verbose==True:
+        print("Error: " + str(e))
+        traceback.print_exc()       
+    else:
+        print("Error: " + str(e))
+        print("Pass the -v flag for more verbose error messages")
+    
+  

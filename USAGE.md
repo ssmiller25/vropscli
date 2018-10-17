@@ -209,3 +209,10 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     ```
     vropscli deleteCredential 00f3527f-8211-4d48-9278-cff871e3abf5
     ```
+
+## 10 - Error
+
+Details errors can be produce by appending the "-v" flag to any command.  For example:
+```
+vropscli uploadPak badfile.pak -v
+```
