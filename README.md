@@ -10,7 +10,11 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 # Development Environment Setup
 
-* Run ```pipenv --python 3.6``` In current directory
+* Make sure to have Python and Pipenv install
+** For Mac, Install Homebrew (this may take a while if Xcode needs to be installed):
+```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
+** ```brew install pipenv```
+* Run ```pipenv --python 3.7``` In current directory
 * Run ```pipenv update``` to ensure everything is up to date
 
 ## To Use
@@ -19,7 +23,8 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 ## To Distribute
 
-* On "target" platofrm (Windows, Mac, etc), run:
+Make sure to compile this on the *oldest* OS you wish to support with your binary!
+* On "target" platform (Windows, Mac, etc), run:
 ```
 pipenv install pyinstaller
 pyinstaller -F vropscli.py
