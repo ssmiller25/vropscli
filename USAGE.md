@@ -100,7 +100,7 @@ vropscli getAdapterCollectionStatus 9516b17d-f2a5-4da0-ab12-c4998dc0889e
     ```
 1. If you are using a different credential for the new adapters, obtain the UUID of that credential
     ```
-    vropscli getCredentials 
+    vropscli getAllCredentials 
     ```
 1. (Opt): If you plan to assign an adapter to a specific collector, you will want to identify the ID of the new collector with the following command
     ```
@@ -134,7 +134,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
 
 1. If you are planning to change credentials, obtain the UUID of the new credential
     ```
-    vropscli getCredentials 
+    vropscli getAllCredentials 
     ```
     1. Adjust the CSV file, then run the update process
     ```
@@ -174,7 +174,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
 1. In to vRealize GUI, create a single credential in the management pack of your choice.  This credential will serve as a template for creating the new instances
 2. Determine the UUID of the new credentials (will be in the "id" field)
     ```
-    vropscli getCredentials
+    vropscli getAllCredentials
     ```
 3. Build out a CSV file containing the details of this credentials.  Note, no passwords will actually be exported.
     ```
@@ -198,7 +198,7 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
 
 1. To remove credentials that are no longer in use, first identify the ID of the credential
     ```
-    vropscli getCredentials
+    vropscli getAllCredentials
     ```
 
 2. Then remove the credential with the command
