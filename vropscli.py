@@ -455,6 +455,7 @@ class vropscli:
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         credssum = {}
         response_parsed = json.loads(response.text)
+
         csvheader=[]
         csvrows=[]
         csvheader = ["id","name","adapterKind"]
@@ -469,6 +470,7 @@ class vropscli:
         csvwr.writeheader()
         for row in csvrows:
             csvwr.writerow(row)
+
 
     def getCredential(self, credentialId):
         '''->
