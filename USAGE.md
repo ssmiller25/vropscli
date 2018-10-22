@@ -24,11 +24,11 @@ if using this utility against a system that is not fully started.
 
 ## 2 - Install/Upgrade Management Packs
 
-First, you will need to upload the management pack...this may take some time
+First, you will need to upload the management pack...this may take some time. *By default, this will overwrite an existing pack!*  It can be overridden by passing --nooverwritePak
 ```
 vropscli uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak
 ```
-Once the upload is done, you will be provided with a pak_id.  Use that to start to install/upgrade.
+Once the upload is done, you will be provided with a pak_id.  Use that to start to install/upgrade.  *By default, this will reset the default content in the Pak!*  It can be overridden by passing --noforce-content-update
 ```
 vropscli installPak OracleDatabase-12020180319144115
 ```
