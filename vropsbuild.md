@@ -20,7 +20,7 @@ make install
 ```
 
 
-# Curl (Against OpneSSL libs, above)
+# Curl (Against OpenSSL libs, above)
 * Download from https://github.com/curl/curl/releases (tar.gz) and scp to vrops system
 
 ````
