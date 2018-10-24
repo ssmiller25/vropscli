@@ -19,6 +19,9 @@ make install
 echo "export LD_LIBRARY_PATH=/usr/local/lib${LD_LIBRARY_PATH}" >> ~/.bash_profile
 echo "export LC_ALL=en_US.utf8" >> ~/.bash_profile
 echo "export export LANG=en_US.utf8" >> ~/.bash_profile
+# Reexecute base_profile, or relogin
+cd ~
+./.bash_profile
 ```
 
 
@@ -37,6 +40,7 @@ wget https://raw.githubusercontent.com/curl/curl/curl-7_53_0/lib/mk-ca-bundle.pl
 perl mk-ca-bundle.pl -k
 export SSL_CERT_FILE=`pwd`/ca-bundle.crt
 echo "export SSL_CERT_FILE=`pwd`/ca-bundle.crt" >> ~/.bash_profile
+cd ..
 ```
 
 # Other libraries
