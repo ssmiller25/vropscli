@@ -18,7 +18,7 @@ make
 make install
 echo "export LD_LIBRARY_PATH=/usr/local/lib${LD_LIBRARY_PATH}" >> ~/.bash_profile
 echo "export LC_ALL=en_US.utf8" >> ~/.bash_profile
-echo "export export LANG=en_US.utf8" >> ~/.bash_profile
+echo "export LANG=en_US.utf8" >> ~/.bash_profile
 # Reexecute base_profile, or relogin
 cd ~
 ./.bash_profile
