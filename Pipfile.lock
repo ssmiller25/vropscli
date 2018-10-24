@@ -53,14 +53,6 @@
             "index": "pypi",
             "version": "==0.1.2"
         },
-        "flask": {
-            "hashes": [
-                "sha256:0749df235e3ff61ac108f69ac178c9770caeaccad2509cb762ce1f65570a8856",
-                "sha256:49f44461237b69ecd901cc7ce66feea0319b9158743dd27a2899962ab214dac1"
-            ],
-            "index": "pypi",
-            "version": "==0.12.2"
-        },
         "idna": {
             "hashes": [
                 "sha256:2c6a5de3089009e3da7c5dde64a141dbc8551d5b7f6cf4ed7c2568d0cc520a8f",
