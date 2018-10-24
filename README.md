@@ -1,6 +1,6 @@
 # vROpsCLI
 
-A utiltiy to assist in managing a vRealize Operation Manager (vROps) environment through the CLI.  A user can perform MP installs and upgrades, licensing management,
+A utility to assist in managing a vRealize Operation Manager (vROps) environment through the CLI.  A user can perform MP installs and upgrades, licensing management,
 endpoint configuration, credential management, and more!  The design is focused around exposing core functionality that can be scripted to make more complex solutions.
 
 * Downloads are available on [the release page](https://github.com/BlueMedoraPublic/vropscli/releases).
