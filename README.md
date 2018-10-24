@@ -5,7 +5,7 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 * Downloads are available on [the release page](https://github.com/BlueMedoraPublic/vropscli/releases).
 * Usage details can be located at [USAGE.md](USAGE.md)
-* Examples scripts that use the utilty are located in the [examples directory](https://github.com/BlueMedoraPublic/vropscli/examples/)
+* Examples scripts that use the utilty are located in the [examples directory](https://github.com/BlueMedoraPublic/vropscli/tree/master/examples)
 
 
 # Development Environment Setup
