@@ -342,7 +342,7 @@ class vropscli:
                 except requests.exceptions.HTTPError as e:
                     error_data = json.loads(e.response.text)
                     if "Resource with same key already exists" in error_data["moreInformation"][1]["value"]:
-                        print("Resource " + row['name'] + "already exists, or shares resources marked unique with another adapter")
+                        print("Adatper Instance " + row['name'] + "already exists, or shares resources marked unique with another adapter")
                     else:
                         raise
                     
