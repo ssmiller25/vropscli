@@ -1,5 +1,13 @@
 # ChangeLog
 
+## v1.2.0
+First public release!
+
+* Better error handing, both overall and in specific use cases.
+* Credentials can be specified on command line as well as saved to local file.
+
+More details can be found in the Github release page
+
 ## v1.1.0
 
 * PR #33: Update some supporting scripts
