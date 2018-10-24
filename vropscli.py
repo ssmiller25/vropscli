@@ -337,7 +337,15 @@ class vropscli:
                     returndata=json.loads(r.text)
                     self.startAdapterInstance(adapterId=returndata["id"])
             else:
-                r.raise_for_status()
+                try:
+                    r.raise_for_status()
+                except requests.exceptions.HTTPError as e:
+                    error_data = json.loads(e.response.text)
+                    if "Resource with same key already exists" in error_data["moreInformation"][1]["value"]:
+                        print("Adatper Instance " + row['name'] + "already exists, or shares resources marked unique with another adapter")
+                    else:
+                        raise
+                    
 
 
     def deleteAdapterInstances(self, resourceConfigFile):
@@ -710,7 +718,15 @@ class vropscli:
             print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
             return True
         else:
-            r.raise_for_status()
+            try:
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                error_data = json.loads(e.response.text)
+                if "Could not find file for PAK ID" in error_data["error_arguments"][0]:
+                    print("No file was found for PAK ID " + pakId)
+                    print("Please verify the Pak ID that was produced after the uploadPak command (this will be different then the actual filename)")
+                else:
+                    raise
 
 
     def groupInstall(self, pakDir, overwritePak=False, force_content_update=True, verbose=False):
