@@ -6,7 +6,6 @@ download the appropriate packaging:
 
 ```
 sudo zypper install gcc gcc-c++ make ncurses patch zlib-devel wget tar xz awk netcfg wget-openssl1 curl-openssl1 libtool automake autoconf
-sudo zypper install git
 ```
 
 # Openssl
