@@ -14,7 +14,7 @@ endpoint configuration, credential management, and more!  The design is focused 
 ** For Mac, Install Homebrew (this may take a while if Xcode needs to be installed):
 ```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
 ** ```brew install pipenv```
-* Run ```pipenv --python 3.7``` In current directory
+* Run ```pipenv --python 3.7``` In current directory (or ```pipenv --python 3.6 for vROps build directly```)
 * Run ```pipenv update``` to ensure everything is up to date
 
 ## To Use

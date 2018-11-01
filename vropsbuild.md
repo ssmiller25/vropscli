@@ -11,7 +11,8 @@ sudo zypper install gcc gcc-c++ make ncurses patch zlib-devel wget tar xz awk ne
 # Openssl
 * Download OpenSSL from https://github.com/openssl/openssl/releases (tar.gz) and scp to vrops system
 ```
-cd openssl/
+tar -xzvf openssl*
+cd openssl-Open*
 ./config --prefix=/usr --openssldir=/usr/local/openssl shared
 make
 make install
@@ -21,7 +22,8 @@ echo "export LANG=en_US.utf8" >> ~/.bash_profile
 chmod 755 ~/.bash_profile
 # Reexecute base_profile, or relogin
 cd ~
-./.bash_profile
+bash ./.bash_profile
+echo $LD_LIBRARY_PATH   # Make sure you get output!!!
 ```
 
 
@@ -77,7 +79,7 @@ cd ..
 curl -O https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
 tar -xzvf Python-3.6.1.tgz
 cd Python-3.6.1/
-./configure --prefix=/usr/local --exec-prefix=/usr/local
+./configure --enable-shared --prefix=/usr/local --exec-prefix=/usr/local
 make
 make install
 ```
