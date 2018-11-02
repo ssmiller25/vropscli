@@ -64,13 +64,6 @@ make
 make install
 cd ..
 
-curl -O https://zlib.net/zlib-1.2.11.tar.gz
-tar -xzvf zlib-1.2.11.tar.gz
-cd zlib-1.2.11/
-./configure
-make
-make install
-cd ..
 ```
 
 # Real Python
