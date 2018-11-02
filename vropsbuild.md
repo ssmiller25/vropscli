@@ -22,7 +22,7 @@ echo "export LANG=en_US.utf8" >> ~/.bash_profile
 chmod 755 ~/.bash_profile
 # Reexecute base_profile, or relogin
 cd ~
-bash ./.bash_profile
+. ./.bash_profile
 echo $LD_LIBRARY_PATH   # Make sure you get output!!!
 ```
 
