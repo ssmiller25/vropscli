@@ -26,9 +26,12 @@ endpoint configuration, credential management, and more!  The design is focused 
 Make sure to compile this on the *oldest* OS you wish to support with your binary!
 * If you wish to compile to work natively on a vROps system (SLES 11), follow the direction in [vropsbuild.md](vropsbuild.md)
 ```
+pipenv shell
 pipenv install pyinstaller
 pyinstaller -F vropscli.py
 ```
+
+Binary build will be in a `dist` directory
 
 # Notes
 
