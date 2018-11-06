@@ -1,5 +1,12 @@
 # ChangeLog
 
+## v1.2.1
+
+* Updated requests to 2.2.0 to address CVE-2018-18074 #94
+* Update instructions for vROps build #62
+
+More details can be found in the Github release page
+
 ## v1.2.0
 First public release!
 
