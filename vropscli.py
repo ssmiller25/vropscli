@@ -601,7 +601,11 @@ class vropscli:
         r = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         print("id,name,version,adapterKind")
         for solution in json.loads(r.text)["solution"]:
-            print(solution["id"] + "," + solution["name"] + "," + str(solution["version"])  + "," + solution["adapterKindKeys"][0])
+            # Resolve issues specific with BLue Medora ITM Adapter
+            if "name" in solution:
+                print(solution["id"] + "," + solution["name"] + "," + str(solution["version"])  + "," + solution["adapterKindKeys"][0])
+            else:
+                print(solution["id"] + ",,," + solution["adapterKindKeys"][0])
 
     def getVropsLicense(self):
         '''->
