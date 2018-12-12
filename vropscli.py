@@ -20,7 +20,7 @@ import traceback
 from pathlib import Path
 
 
-VERSION="1.2.1"
+VERSION="1.2.2"
 
 class vropscli:
 
