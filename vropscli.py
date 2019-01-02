@@ -873,6 +873,41 @@ class vropscli:
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
 
+    def createRelationships(self, relationshipsFile):
+        '''->
+
+        Create resource relationships from a file
+
+        RELATIONSHIPSFILE:  CSV file of alerts to create. The first column is the parent UUID and the second column is the child UUID.
+
+        '''
+
+        with open(relationshipsFile) as relationshipsCsv:
+            # The csv#DictReader iterates through the file as we process it, so the file needs to be left open
+            relationshipsData = csv.DictReader(relationshipsCsv, ["parent", "child"])
+
+            successCount = 0
+
+            for relationshipRow in relationshipsData:
+                url = f'https://{self.config["host"]}/suite-api/api/resources/{relationshipRow["parent"]}/relationships/CHILD'
+                childUuids = [relationshipRow["child"]] # TODO: Batch requests for relationships having the same parent for better performance
+                reqBody = json.dumps({"uuids": childUuids})
+
+                r = requests.post(url, data=reqBody, headers=clilib.get_token_header(self.token['token']), verify=False)
+
+                if (r.status_code != 204):
+                    print(f'Failed to create {relationshipRow["parent"]} -> {relationshipRow["child"]} relationship.')
+                    print(f'API Response Status Code: {r.status_code}')
+                    print(f'API Response Text: {r.text}')
+                    print()
+                else:
+                    successCount += 1
+
+            if (successCount > 0):
+                print(f'{successCount} relationships successfully created.')
+            else:
+                print('No relationships created.')
+
     def saveCliCred(self):
         '''->
 
