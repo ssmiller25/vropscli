@@ -161,7 +161,7 @@ def lookup_object_id_by_name(token, host, adapterType, objectType, objectName):
     A partial collection is returned if there are too many pages of objects from the API
     '''
     uuids = []
-    url = f'https://{host}/suite-api/api/adapterkinds/{adapterType}/resourcekinds/{objectType}/resources?name={objectName}'
+    url = f"https://{host}/suite-api/api/adapterkinds/{adapterType}/resourcekinds/{objectType}/resources?name={objectName}"
     pageLimit = 100
     while (url != None and pageLimit > 0):
         resp = requests.get(url, headers=get_token_header(token), verify=False)
@@ -177,7 +177,7 @@ def lookup_object_id_by_name(token, host, adapterType, objectType, objectName):
         if nextHref is None:
             url = None
         else:
-            url = f'https://{host}{nextHref}'
+            url = f"https://{host}{nextHref}"
 
     # In practice, hitting the pageLimit should almost never happen, and is almost certainly an error
     # We only check the pageLimit as a stopgap to prevent infinite loops
@@ -188,7 +188,7 @@ def create_relationships_by_ids(token, host, parentUuid, childUuids):
     Adds a relationship between objects identified by UUID
     Returns a tuple of (success flag, response object)
     '''
-    url = f'https://{host}/suite-api/api/resources/{parentUuid}/relationships/CHILD'
+    url = f"https://{host}/suite-api/api/resources/{parentUuid}/relationships/CHILD"
     reqBody = json.dumps({"uuids": childUuids})
 
     r = requests.post(url, data=reqBody, headers=get_token_header(token), verify=False)

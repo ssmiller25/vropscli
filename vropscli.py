@@ -888,24 +888,24 @@ class vropscli:
 
         with open(relationshipsFile) as relationshipsCsv:
             # The csv#DictReader iterates through the file as we process it, so the file needs to be left open
-            relationshipsData = csv.DictReader(relationshipsCsv, ["parent", "child"])
+            relationshipsData = csv.DictReader(relationshipsCsv, ['parent', 'child'])
 
             successCount = 0
 
             for relationshipRow in relationshipsData:
-                childUuids = [relationshipRow["child"]] # TODO: Batch requests for relationships having the same parent for better performance
-                (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config["host"], relationshipRow["parent"], childUuids)
+                childUuids = [relationshipRow['child']] # TODO: Batch requests for relationships having the same parent for better performance
+                (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config['host'], relationshipRow['parent'], childUuids)
 
                 if (not success):
-                    print(f'Failed to create {relationshipRow["parent"]} -> {relationshipRow["child"]} relationship.')
-                    print(f'API Response Status Code: {r.status_code}')
-                    print(f'API Response Text: {r.text}')
+                    print(f"Failed to create {relationshipRow['parent']} -> {relationshipRow['child']} relationship.")
+                    print(f"API Response Status Code: {r.status_code}")
+                    print(f"API Response Text: {r.text}")
                     print()
                 else:
                     successCount += 1
 
             if (successCount > 0):
-                print(f'{successCount} relationships successfully created.')
+                print(f"{successCount} relationships successfully created.")
             else:
                 print('No relationships created.')
 
@@ -939,13 +939,13 @@ class vropscli:
 
         with open(relationshipsFile) as relationshipsCsv:
             # The csv#DictReader iterates through the file as we process it, so the file needs to be left open
-            relationshipsData = csv.DictReader(relationshipsCsv, ["parent-adapter", "parent-type", "parent-name", "child-adapter", "child-type", "child-name"])
+            relationshipsData = csv.DictReader(relationshipsCsv, ['parent-adapter', 'parent-type', 'parent-name', 'child-adapter', 'child-type', 'child-name'])
 
             successCount = 0
 
             for relationshipRow in relationshipsData:
-                (parentUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config["host"], relationshipRow["parent-adapter"], relationshipRow["parent-type"], relationshipRow["parent-name"])
-                (childUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config["host"], relationshipRow["child-adapter"], relationshipRow["child-type"], relationshipRow["child-name"])
+                (parentUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config['host'], relationshipRow['parent-adapter'], relationshipRow['parent-type'], relationshipRow['parent-name'])
+                (childUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config['host'], relationshipRow['child-adapter'], relationshipRow['child-type'], relationshipRow['child-name'])
                 # Ignoring the partial flag, since there's no reason we should return 100,000+ objects
 
                 if (len(parentUUIDs) == 0):
@@ -955,9 +955,9 @@ class vropscli:
 
                 if (matchMode.lower() == "skip"):
                     if (len(parentUUIDs) != 1):
-                        print(f'Expected to find only one object for {relationshipRow["parent-adapter"]},{relationshipRow["parent-type"]},{relationshipRow["parent-name"]}. {len(parentUUIDs)} found instead. Skipping this relationship.')
+                        print(f"Expected to find only one object for {relationshipRow['parent-adapter']},{relationshipRow['parent-type']},{relationshipRow['parent-name']}. {len(parentUUIDs)} found instead. Skipping this relationship.")
                     if (len(childUUIDs) != 1):
-                        print(f'Expected to find only one object for {relationshipRow["child-adapter"]},{relationshipRow["child-type"]},{relationshipRow["child-name"]}. {len(childUUIDs)} found instead. Skipping this relationship.')
+                        print(f"Expected to find only one object for {relationshipRow['child-adapter']},{relationshipRow['child-type']},{relationshipRow['child-name']}. {len(childUUIDs)} found instead. Skipping this relationship.")
                     continue
 
                 if (matchMode.lower() == "first"):
@@ -965,18 +965,18 @@ class vropscli:
                     childUUIDs = [childUUIDs[0]]
 
                 for parentUUID in parentUUIDs:
-                    (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config["host"], parentUUID, childUUIDs)
+                    (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config['host'], parentUUID, childUUIDs)
 
                     if (not success):
-                        print(f'Failed to create {relationshipRow["parent"]} -> {relationshipRow["child"]} relationship.')
-                        print(f'API Response Status Code: {r.status_code}')
-                        print(f'API Response Text: {r.text}')
+                        print(f"Failed to create {relationshipRow['parent']} -> {relationshipRow['child']} relationship.")
+                        print(f"API Response Status Code: {r.status_code}")
+                        print(f"API Response Text: {r.text}")
                         print()
                     else:
                         successCount += len(childUUIDs)
             
             if (successCount > 0):
-                print(f'{successCount} relationships successfully created.')
+                print(f"{successCount} relationships successfully created.")
             else:
                 print('No relationships created.')
 
