@@ -975,7 +975,7 @@ class vropscli:
                     (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config['host'], parentUUID, childUUIDs)
 
                     if (not success):
-                        print(f"Failed to create {relationshipRow['parent']} -> {relationshipRow['child']} relationship.")
+                        print(f"Failed to create {parentUUID} -> {childUUIDs} relationship.")
                         print(f"API Response Status Code: {r.status_code}")
                         print(f"API Response Text: {r.text}")
                         print()
