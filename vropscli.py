@@ -936,6 +936,10 @@ class vropscli:
           The matchmode is case-insensitive.
 
         '''
+        lMatchMode = matchMode.lower()
+        if (lMatchMode not in ["first", "all", "skip"]):
+            print(f"Unknown matchMode <{matchMode}>. 'first', 'all', or 'skip' expected.")
+            return
 
         with open(relationshipsFile) as relationshipsCsv:
             # The csv#DictReader iterates through the file as we process it, so the file needs to be left open
@@ -953,14 +957,15 @@ class vropscli:
                 if (len(childUUIDs) == 0):
                     print(f"No object found for {relationshipRow['child-adapter']},{relationshipRow['child-type']},{relationshipRow['child-name']}. Skipping this relationship.")
 
-                if (matchMode.lower() == "skip"):
+                if (lMatchMode == "skip"):
                     if (len(parentUUIDs) != 1):
                         print(f"Expected to find only one object for {relationshipRow['parent-adapter']},{relationshipRow['parent-type']},{relationshipRow['parent-name']}. {len(parentUUIDs)} found instead. Skipping this relationship.")
+                        continue
                     if (len(childUUIDs) != 1):
                         print(f"Expected to find only one object for {relationshipRow['child-adapter']},{relationshipRow['child-type']},{relationshipRow['child-name']}. {len(childUUIDs)} found instead. Skipping this relationship.")
-                    continue
+                        continue
 
-                if (matchMode.lower() == "first"):
+                if (lMatchMode == "first"):
                     parentUUIDs = [parentUUIDs[0]]
                     childUUIDs = [childUUIDs[0]]
 
