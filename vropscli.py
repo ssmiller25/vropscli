@@ -909,6 +909,77 @@ class vropscli:
             else:
                 print('No relationships created.')
 
+    def createRelationshipsByName(self, relationshipsFile, matchMode = "first"):
+        '''->
+
+        Create resource relationships from a file
+
+        RELATIONSHIPSFILE:  CSV file of alerts to create. The columns are: 
+          * Parent Adapter Type ("VMWARE" for example, for vCenter adapters -- Use the getAdapters verb to list adapter types in your environment)
+          * Parent Object Type ("VirtualMachine" for example, for VM's)
+          * Parent Object Name
+          * Child Adapter Type
+          * Child Object Type
+          * Child Object Name
+
+          Do not include a header row.
+
+          Example row:
+          VMWARE,VirtualMachine,agent-builder,VMWARE,VirtualMachine,3par-vsp
+
+        MATCHMODE: One of...
+          * first (default) - Make a relationship to the first object, even if there are multiple objects with that name
+          * all - Make relationships to every object found with that name
+          * skip - Skip (and log) whenever more than one object is found with that name
+
+          To match an object exactly, the createRelationshipsById verb can be used.
+          The matchmode is case-insensitive.
+
+        '''
+
+        with open(relationshipsFile) as relationshipsCsv:
+            # The csv#DictReader iterates through the file as we process it, so the file needs to be left open
+            relationshipsData = csv.DictReader(relationshipsCsv, ["parent-adapter", "parent-type", "parent-name", "child-adapter", "child-type", "child-name"])
+
+            successCount = 0
+
+            for relationshipRow in relationshipsData:
+                (parentUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config["host"], relationshipRow["parent-adapter"], relationshipRow["parent-type"], relationshipRow["parent-name"])
+                (childUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config["host"], relationshipRow["child-adapter"], relationshipRow["child-type"], relationshipRow["child-name"])
+                # Ignoring the partial flag, since there's no reason we should return 100,000+ objects
+
+                if (len(parentUUIDs) == 0):
+                    print(f"No object found for {relationshipRow['parent-adapter']},{relationshipRow['parent-type']},{relationshipRow['parent-name']}. Skipping this relationship.")
+                if (len(childUUIDs) == 0):
+                    print(f"No object found for {relationshipRow['child-adapter']},{relationshipRow['child-type']},{relationshipRow['child-name']}. Skipping this relationship.")
+
+                if (matchMode.lower() == "skip"):
+                    if (len(parentUUIDs) != 1):
+                        print(f'Expected to find only one object for {relationshipRow["parent-adapter"]},{relationshipRow["parent-type"]},{relationshipRow["parent-name"]}. {len(parentUUIDs)} found instead. Skipping this relationship.')
+                    if (len(childUUIDs) != 1):
+                        print(f'Expected to find only one object for {relationshipRow["child-adapter"]},{relationshipRow["child-type"]},{relationshipRow["child-name"]}. {len(childUUIDs)} found instead. Skipping this relationship.')
+                    continue
+
+                if (matchMode.lower() == "first"):
+                    parentUUIDs = [parentUUIDs[0]]
+                    childUUIDs = [childUUIDs[0]]
+
+                for parentUUID in parentUUIDs:
+                    (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config["host"], parentUUID, childUUIDs)
+
+                    if (not success):
+                        print(f'Failed to create {relationshipRow["parent"]} -> {relationshipRow["child"]} relationship.')
+                        print(f'API Response Status Code: {r.status_code}')
+                        print(f'API Response Text: {r.text}')
+                        print()
+                    else:
+                        successCount += len(childUUIDs)
+            
+            if (successCount > 0):
+                print(f'{successCount} relationships successfully created.')
+            else:
+                print('No relationships created.')
+
     def saveCliCred(self):
         '''->
 
