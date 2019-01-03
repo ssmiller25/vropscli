@@ -954,8 +954,10 @@ class vropscli:
 
                 if (len(parentUUIDs) == 0):
                     print(f"No object found for {relationshipRow['parent-adapter']},{relationshipRow['parent-type']},{relationshipRow['parent-name']}. Skipping this relationship.")
+                    continue
                 if (len(childUUIDs) == 0):
                     print(f"No object found for {relationshipRow['child-adapter']},{relationshipRow['child-type']},{relationshipRow['child-name']}. Skipping this relationship.")
+                    continue
 
                 if (lMatchMode == "skip"):
                     if (len(parentUUIDs) != 1):
