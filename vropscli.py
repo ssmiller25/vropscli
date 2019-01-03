@@ -873,12 +873,16 @@ class vropscli:
         r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
 
-    def createRelationships(self, relationshipsFile):
+    def createRelationshipsById(self, relationshipsFile):
         '''->
 
         Create resource relationships from a file
 
-        RELATIONSHIPSFILE:  CSV file of alerts to create. The first column is the parent UUID and the second column is the child UUID.
+        RELATIONSHIPSFILE:  CSV file of alerts to create. The columns are:
+         * Parent UUID
+         * Child UUID
+
+         Do not include a header row.
 
         '''
 
@@ -889,13 +893,10 @@ class vropscli:
             successCount = 0
 
             for relationshipRow in relationshipsData:
-                url = f'https://{self.config["host"]}/suite-api/api/resources/{relationshipRow["parent"]}/relationships/CHILD'
                 childUuids = [relationshipRow["child"]] # TODO: Batch requests for relationships having the same parent for better performance
-                reqBody = json.dumps({"uuids": childUuids})
+                (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config["host"], relationshipRow["parent"], childUuids)
 
-                r = requests.post(url, data=reqBody, headers=clilib.get_token_header(self.token['token']), verify=False)
-
-                if (r.status_code != 204):
+                if (not success):
                     print(f'Failed to create {relationshipRow["parent"]} -> {relationshipRow["child"]} relationship.')
                     print(f'API Response Status Code: {r.status_code}')
                     print(f'API Response Text: {r.text}')

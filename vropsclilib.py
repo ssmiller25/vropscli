@@ -183,3 +183,16 @@ def lookup_object_id_by_name(token, host, adapterType, objectType, objectName):
     # We only check the pageLimit as a stopgap to prevent infinite loops
     return (uuids, pageLimit == 0)
 
+def create_relationships_by_ids(token, host, parentUuid, childUuids):
+    '''
+    Adds a relationship between objects identified by UUID
+    Returns a tuple of (success flag, response object)
+    '''
+    url = f'https://{host}/suite-api/api/resources/{parentUuid}/relationships/CHILD'
+    reqBody = json.dumps({"uuids": childUuids})
+
+    print(f"url: {url}")
+    print(f"reqBody: {reqBody}")
+    r = requests.post(url, data=reqBody, headers=get_token_header(token), verify=False)
+
+    return (r.status_code == 204, r)
