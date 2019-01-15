@@ -83,9 +83,9 @@ def getToken(conf):
         if response.status_code < 300:
             return json.loads(response.text)
         else:
-            print('Return code: ' + str(r.status_code))
+            print('Return code: ' + str(response.status_code))
             print('Return text: ')
-            print(r.text)
+            print(response.text)
             sys.exit(1)
     except Exception as e:
         print('Error authenticating to vROPs system.  Check the passed hostname or parameters in .vropscli.yml')
