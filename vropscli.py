@@ -653,15 +653,10 @@ class vropscli:
         OVERWRITEPAK:  Overwrite existing pak. Default is true
 
         '''
-        if overwritePak == True:
-            pak_handling_advice = 'CLOBBER'
-        else:
-            pak_handling_advice = 'STANDARD'
-        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/reserved/operation/upload'
-        files = { 'contents': open(pakFile, 'rb') }
-        data = { 'pak_handling_advice': pak_handling_advice }
+
         print("Started Pak Upload: " + str(pakFile) + ".  This may take up to 20 minutes depending on network speed.")
-        r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
+        r = clilib.upload_pak(self.config['host'], self.config['user'], self.config['pass'], pakFile, overwritePak)
+
         if r.status_code < 300:
             print('Upload Successful!')
             return json.loads(r.text)

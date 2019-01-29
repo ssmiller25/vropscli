@@ -154,3 +154,21 @@ def wait_for_casa(host, timeout=40):
         except:
             print('Exception when trying to GET ' + url)
             return False
+
+def upload_pak(host, username, password, pakFile, overwritePak):
+    '''
+    Uploads a pak file to the server.
+    Returns the API response object
+    '''
+
+    if overwritePak == True:
+        pak_handling_advice = 'CLOBBER'
+    else:
+        pak_handling_advice = 'STANDARD'
+    url = f'https://{host}/casa/upgrade/cluster/pak/reserved/operation/upload'
+    files = { 'contents': open(pakFile, 'rb') }
+    data = { 'pak_handling_advice': pak_handling_advice }
+
+    r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(username, password), verify=False)
+
+    return r
