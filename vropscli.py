@@ -746,10 +746,19 @@ class vropscli:
         # Upload and install each pak
         for pak in paks:
             full_path = pakDir + "/" + pak
-            r = self.uploadPak(full_path, overwritePak)
-            if r != None:
-                print(r)
-                self.installPak(r["pak_id"], force_content_update)
+            print(f"Started Pak Upload: {str(full_path)}.  This may take up to 20 minutes depending on network speed.")
+            r = clilib.upload_pak(self.config['host'], self.config['user'], self.config['pass'], full_path, overwritePak)
+
+            if not(r.status_code < 300):
+                print(f"Failed to upload pak {full_path}")
+                print(f"Skipping install")
+                print(r.text)
+                continue
+
+            response_data = json.loads(r.text)
+            if response_data != None:
+                print(response_data)
+                self.installPak(response_data["pak_id"], force_content_update)
                 while True:
                     status = self.getCurrentActivity()
                     if verbose == True:
