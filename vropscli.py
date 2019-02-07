@@ -297,11 +297,10 @@ class vropscli:
         else:
             r.raise_for_status()
 
-    def deleteAllActiveAlerts(self):
+    def deleteAllCancelledAlerts(self):
         url = 'https://' + self.config['host'] + '/suite-api/api/alerts/bulk/'
         request_dict = {
-            "activeOnly": True,
-            "alertStatus": ["ACTIVE"]
+            "alertStatus": ["CANCELLED"]
         }
         req_data = json.dumps(request_dict)
         r = requests.delete(url, data=req_data, headers=clilib.get_token_header(self.token['token']), verify=False)
