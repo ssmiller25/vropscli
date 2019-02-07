@@ -932,7 +932,7 @@ class vropscli:
             print(configfile + ' successfully saved!')
             print('WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to your vROps system!!!')
         except Exception as e:
-            print "Vault login failed"
+            print("Vault login failed")
             print(e)
 
     def version(self):
