@@ -300,12 +300,13 @@ class vropscli:
     def deleteAllCancelledAlerts(self):
         url = 'https://' + self.config['host'] + '/suite-api/api/alerts/bulk/'
         request_dict = {
-            "alertStatus": ["CANCELLED"]
+            "alertStatus": ["CANCELED"]
         }
         req_data = json.dumps(request_dict)
         r = requests.delete(url, data=req_data, headers=clilib.get_token_header(self.token['token']), verify=False)
+        print(r.text)
         if r.status_code < 300:
-            print('all active alerts successfully deleted.')
+            print('all cancelled alerts successfully deleted.')
         else:
             r.raise_for_status()
 
