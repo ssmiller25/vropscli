@@ -297,6 +297,19 @@ class vropscli:
         else:
             r.raise_for_status()
 
+    def deleteAllActiveAlerts(self):
+        url = 'https://' + self.config['host'] + '/suite-api/api/alerts/bulk/'
+        request_dict = {
+            "activeOnly": True,
+            "alertStatus": ["ACTIVE"]
+        }
+        req_data = json.dumps(request_dict)
+        r = requests.delete(url, data=req_data, headers=clilib.get_token_header(self.token['token']), verify=False)
+        if r.status_code < 300:
+            print('all active alerts successfully deleted.')
+        else:
+            r.raise_for_status()
+
     def createAdapterInstances(self, resourceConfigFile, autostart=False):
         '''->
 
