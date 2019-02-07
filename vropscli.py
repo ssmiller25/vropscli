@@ -16,6 +16,7 @@ import os
 import time
 import yaml 
 import traceback
+import hvac
 #from urllib3.exceptions import HTTPError
 from pathlib import Path
 
@@ -898,6 +899,41 @@ class vropscli:
             yaml.dump(fullconfig, c, default_flow_style=False)
         print(configfile + ' successfully saved!')
         print('WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to your vROps system!!!')
+    def vaultLogin(self):
+        '''->
+
+        Save Credentials to a local file, $HOME/.vropscli.yml
+        WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to
+        your vROps system!!!
+
+        Make sure to SET ENV variables:
+        export VAULT_URL=https://vault.example.localnet:8200/
+        export VAULT_TOKEN=REPLACETOKEN
+        export SECRET_PATH=REPLACE_PATH
+        '''
+        try:
+            client = hvac.Client()
+            client = hvac.Client(
+            url=os.environ['VAULT_URL'],
+            token=os.environ['VAULT_TOKEN'],
+            verify=False
+            )
+            result = client.read(os.environ['SECRET_PATH'])
+            fullconfig={
+                'default':{
+                    'user':result["data"]["user"],
+                    'passencrypt':clilib.vig(result["data"]["password"],clilib.ENCODE,'e'),
+                    'host':result["data"]["host"]
+                }
+            }
+            configfile=os.path.join(str(Path.home()), ".vropscli.yml")
+            with open(os.path.expanduser(configfile),"w") as c:
+                yaml.dump(fullconfig, c, default_flow_style=False)
+            print(configfile + ' successfully saved!')
+            print('WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to your vROps system!!!')
+        except Exception as e:
+            print "Vault login failed"
+            print(e)
 
     def version(self):
         print("Blue Medora vROpsCLI")
@@ -928,6 +964,8 @@ class vropscli:
                 print("Use --user, --password, and --host to specify on the command line")
                 print("You may also setup a saved credential file at " + os.path.join(str(Path.home()), ".vropscli.yml") + " by running the following:")
                 print("    vropscli --user <username> --password <password> --host <host> saveCliCred")
+                print("For credentials from vault")
+                print("set env variables and run 'vropscli vaultLogin'")
                 print("Please review the documentation to understand the ramifications of using a credential file")
                 sys.exit(1)
 

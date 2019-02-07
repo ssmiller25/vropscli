@@ -21,6 +21,16 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 * Run ```pipenv shell``` to enter environment
 
+## Credentials from Vault 
+- Create 3 variable in vault secret as user,password and host
+- Set below env variables
+```
+export VAULT_URL=https://vault.example.localnet:8200/
+export VAULT_TOKEN=REPLACETOKEN
+export SECRET_PATH=REPLACE_PATH
+vropscli vaultLogin
+```
+
 ## To Distribute
 
 Make sure to compile this on the *oldest* OS you wish to support with your binary!
