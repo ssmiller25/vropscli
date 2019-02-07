@@ -907,14 +907,14 @@ class vropscli:
         your vROps system!!!
 
         Make sure to SET ENV variables:
-        export VAULT_URL=https://vault.example.localnet:8200/
+        export VAULT_ADDR=https://vault.example.localnet:8200/
         export VAULT_TOKEN=REPLACETOKEN
         export SECRET_PATH=REPLACE_PATH
         '''
         try:
             client = hvac.Client()
             client = hvac.Client(
-            url=os.environ['VAULT_URL'],
+            url=os.environ['VAULT_ADDR'],
             token=os.environ['VAULT_TOKEN'],
             verify=False
             )
