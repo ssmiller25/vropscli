@@ -6,24 +6,28 @@ endpoint configuration, credential management, and more!  The design is focused 
 * Downloads are available on [the release page](https://github.com/BlueMedoraPublic/vropscli/releases).
 * Usage details can be located at [USAGE.md](USAGE.md)
 * Examples scripts that use the utilty are located in the [examples directory](https://github.com/BlueMedoraPublic/vropscli/tree/master/examples)
-
+* Blog articles
+  * [Introducing vROpsCLI from Blue Medora](https://bluemedora.com/introducing-vropscli-from-blue-medora/)
+  * [Blue Medora vROpsCLI Tutorial Part One: Getting Started](https://bluemedora.com/blue-medora-vropscli-tutorial-part-one-getting-started/) 
 
 # Development Environment Setup
 
 * Make sure to have Python and Pipenv install
-** For Mac, Install Homebrew (this may take a while if Xcode needs to be installed):
-```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
-** ```brew install pipenv```
-* Run ```pipenv --python 3.7``` In current directory (or ```pipenv --python 3.6 for vROps build directly```)
-* Run ```pipenv update``` to ensure everything is up to date
+  * For Mac, Install Homebrew (this may take a while if Xcode needs to be installed):
+```
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+* Run `pipenv --python 3.7` In current directory (or `pipenv --python 3.6 for vROps build directly`)
+* Run `pipenv update` to ensure everything is up to date
 
 ## To Use
 
-* Run ```pipenv shell``` to enter environment
+* Run `pipenv shell` to enter environment
 
 ## To Distribute
 
 Make sure to compile this on the *oldest* OS you wish to support with your binary!
+
 * If you wish to compile to work natively on a vROps system (SLES 11), follow the direction in [vropsbuild.md](vropsbuild.md)
 ```
 pipenv shell
