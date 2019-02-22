@@ -154,3 +154,43 @@ def wait_for_casa(host, timeout=40):
         except:
             print('Exception when trying to GET ' + url)
             return False
+
+def lookup_object_id_by_name(token, host, adapterType, objectType, objectName):
+    '''
+    Returns a tuple of (collection of vROps objects id's by name, whether this is a partial collection)
+    A partial collection is returned if there are too many pages of objects from the API
+    '''
+    uuids = []
+    url = f"https://{host}/suite-api/api/adapterkinds/{adapterType}/resourcekinds/{objectType}/resources?name={objectName}"
+    pageLimit = 100
+    while (url != None and pageLimit > 0):
+        resp = requests.get(url, headers=get_token_header(token), verify=False)
+        objData = json.loads(resp.text)
+
+        uuids.extend(map(lambda x: x["identifier"], objData["resourceList"]))
+
+        pageLimit -= 1
+
+        # If the results are paginated, there will be a "next" link
+        # Check if one exists, and if so, set that to be our next url; otherwise set to None
+        nextHref = next((x["href"] for x in objData["links"] if x["name"] == "next"), None)
+        if nextHref is None:
+            url = None
+        else:
+            url = f"https://{host}{nextHref}"
+
+    # In practice, hitting the pageLimit should almost never happen, and is almost certainly an error
+    # We only check the pageLimit as a stopgap to prevent infinite loops
+    return (uuids, pageLimit == 0)
+
+def create_relationships_by_ids(token, host, parentUuid, childUuids):
+    '''
+    Adds a relationship between objects identified by UUID
+    Returns a tuple of (success flag, response object)
+    '''
+    url = f"https://{host}/suite-api/api/resources/{parentUuid}/relationships/CHILD"
+    reqBody = json.dumps({"uuids": childUuids})
+
+    r = requests.post(url, data=reqBody, headers=get_token_header(token), verify=False)
+
+    return (r.status_code == 204, r)
