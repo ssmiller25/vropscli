@@ -18,6 +18,7 @@ import yaml
 import traceback
 #from urllib3.exceptions import HTTPError
 from pathlib import Path
+import getpass
 
 
 VERSION="1.2.2"
@@ -1027,10 +1028,13 @@ class vropscli:
     def __init__(self, user=None, password=None, host=None):
         self.config = {}
         requests.packages.urllib3.disable_warnings()
-        if user and password and host:
+        if user and host:
             self.config['user'] = user
-            self.config['pass'] = password
             self.config['host'] = host
+            if password:
+                self.config['pass'] = password
+            else:
+                self.config['pass'] = getpass.getpass("Password: ")
             self.token=clilib.getToken(self.config)
         else:
             try:
