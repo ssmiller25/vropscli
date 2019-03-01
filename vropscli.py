@@ -716,7 +716,14 @@ class vropscli:
         if force_content_update == True:
             install_data['force_content_update'] = True 
         else:
-            install_data['force_content_update'] = False 
+            install_data['force_content_update'] = False
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/information'
+        r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"], self.config["pass"]), verify=False)
+        if r.status_code < 300:
+            print("Valid pakId")
+        else:
+            return "Invalid pakId. Get the pak_information attribute in Upload pak command response"
+
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install' 
         r = requests.post(url, headers=clilib.get_headers_plain(), data=json.dumps(install_data), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
