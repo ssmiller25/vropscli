@@ -13,7 +13,7 @@ import time
 import json
 import base64
 from math import ceil
-from yaml import load,dump
+from yaml import load,dump,FullLoader
 from sys import exit
 from os import path
 from pathlib import Path
@@ -46,7 +46,7 @@ def getConfig():
     '''
     configfile=path.join(str(Path.home()), ".vropscli.yml")
     with open(path.expanduser(configfile),"r") as c:
-        config = load(c)
+        config = load(c, Loader=FullLoader)
     # Test for encrypted password, and if not then add it.
     for sectionkey,section in config.items():
         if not "passencrypt" in section:

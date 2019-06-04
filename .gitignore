@@ -110,3 +110,6 @@ data
 # ssm - ignore and vrops pak and csv files
 *pak
 *csv
+
+# ssm - vscode specific folders
+.vscode
