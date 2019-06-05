@@ -12,7 +12,4 @@ pipeline {
             }
         }
     }
-    post {
-        echo currentBuild.result
-    }
-} 
+}
