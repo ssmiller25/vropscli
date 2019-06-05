@@ -112,7 +112,7 @@ data
 *csv
 
 # ssm - vscode specific folders
-.vscodeartifacts/
+.vscode
 
 # ignore builds from build script
 artifacts/
