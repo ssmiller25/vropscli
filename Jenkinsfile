@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label "linux && docker"
+    }
     stages {
         stage('Checkout SCM') {
             steps {
@@ -12,4 +14,4 @@ pipeline {
             }
         }
     }
-}
+} 
