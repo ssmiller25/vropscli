@@ -1,5 +1,5 @@
 #!/bin/sh
-# Supports all linux (includs vrops)
+# Supports all linux (includes vrops)
 
 VERSION=`cat vropscli.py | grep 'VERSION=' | cut -b 9- | tr -d '"'`
 if [ -z "$VERSION" ]
