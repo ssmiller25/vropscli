@@ -25,7 +25,7 @@ pipeline {
                         }
                         stage('Test linux build commands') {
                             steps {
-                                sh '''./artifacts/vropscli_linux_v${VERSION} --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'''
+                                sh '''./artifacts/vropscli_linux_v${env.VERSION} --user ${env.VROPSCLI_USER_PSW} --password ${env.VROPSCLI_PASSWORD_PSW} --host vropscli-ci.bluemedora.localnet'''
                             }
                         }
                     }
@@ -56,7 +56,7 @@ pipeline {
                         }
                         stage('Test windows build commands') {
                             steps {
-                                bat '''dist\\vropscli --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'''
+                                bat '''dist\\vropscli --user ${env.VROPSCLI_USER_PSW} --password ${env.VROPSCLI_PASSWORD_PSW} --host vropscli-ci.bluemedora.localnet'''
                             }
                         }
                     }
