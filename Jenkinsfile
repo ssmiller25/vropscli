@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Run parallel scripts'){
             parallel{
-                stage ('Linux'){
+                stages ('Linux'){
                     agent {
                         label "linux && docker"
                     }
@@ -28,7 +28,7 @@ pipeline {
                         }
                     }
                 }
-                stage ('Windows'){
+                stages ('Windows'){
                     agent {
                         label "windows"
                     }
