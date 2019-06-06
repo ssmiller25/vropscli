@@ -19,8 +19,7 @@ pipeline {
                     }
                     steps{
                         checkout scm
-                        bat '''path
-                        python -m pip install --upgrade pip
+                        bat '''python -m pip install --upgrade pip
 
                         pip install pipenv
 
@@ -30,7 +29,6 @@ pipeline {
 
                         pipenv install pyinstaller
                         pipenv run pyinstaller -F vropscli.py'''
-
                     }
                 }
             }
