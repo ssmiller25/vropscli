@@ -28,7 +28,10 @@ pipeline {
                             //withCredentials([usernamePassword(credentialsId: 'vropscli_user', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                             steps {
                                 //withCredentials([string(credentialsId: 'vropscli_user', variable: 'VROPSCLI_USER'), string(credentialsId: 'vropscli_password', variable: 'VROPSCLI_PASSWORD')]) {
-                                sh '''./artifacts/vropscli_linux_v1.2.2 --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'''
+                                sh '''
+                                echo ${VROPSCLI_USER} 
+                                echo ${VROPSCLI_PASSWORD}
+                                ./artifacts/vropscli_linux_v1.2.2 --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'''
                                 //}
                             }
                         }
