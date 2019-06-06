@@ -2,8 +2,8 @@ pipeline {
 	agent any
     environment {
         VERSION = sh '''cat vropscli.py | grep 'VERSION=' | cut -b 9- | tr -d '"'''
-        VROPSCLI_USER = credentials('vropscli_user')
-        VROPSCLI_PASSWORD = credentials('vropscli_password')
+        //VROPSCLI_USER = credentials('vropscli_user')
+        //VROPSCLI_PASSWORD = credentials('vropscli_password')
     }
     stages {
         stage('Run parallel scripts'){
@@ -24,8 +24,11 @@ pipeline {
                             }
                         }
                         stage('Test linux build commands') {
+
+                            withCredentials([usernamePassword(credentialsId: 'vropscli_user', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            withCredentials([string(credentialsId: 'vropscli_user', variable: 'VROPSCLI_USER'), string(credentialsId: 'vropscli_password', variable: 'VROPSCLI_PASSWORD')]) {
                             steps {
-                                sh '''./artifacts/vropscli_linux_v${env.VERSION} --user ${env.VROPSCLI_USER_PSW} --password ${env.VROPSCLI_PASSWORD_PSW} --host vropscli-ci.bluemedora.localnet'''
+                                sh '''./artifacts/vropscli_linux_v${env.VERSION} --user ${VROPSCLI_USER_PSW} --password ${VROPSCLI_PASSWORD_PSW} --host vropscli-ci.bluemedora.localnet'''
                             }
                         }
                     }
