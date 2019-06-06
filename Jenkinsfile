@@ -25,7 +25,7 @@ pipeline {
                         }
                         stage('Test linux build commands') {
 
-                            withCredentials([usernamePassword(credentialsId: 'vropscli_user', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            //withCredentials([usernamePassword(credentialsId: 'vropscli_user', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                             withCredentials([string(credentialsId: 'vropscli_user', variable: 'VROPSCLI_USER'), string(credentialsId: 'vropscli_password', variable: 'VROPSCLI_PASSWORD')]) {
                             steps {
                                 sh '''./artifacts/vropscli_linux_v${env.VERSION} --user ${VROPSCLI_USER_PSW} --password ${VROPSCLI_PASSWORD_PSW} --host vropscli-ci.bluemedora.localnet'''
