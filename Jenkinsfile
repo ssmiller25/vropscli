@@ -1,10 +1,10 @@
 pipeline {
 	agent any
-    environment {
+    //environment {
         //VERSION = sh '''cat vropscli.py | grep 'VERSION=' | cut -b 9- | tr -d '"'''
         //VROPSCLI_USER = credentials('vropscli_user')
         //VROPSCLI_PASSWORD = credentials('vropscli_password')
-    }
+    //}
     stages {
         stage('Run parallel scripts'){
             parallel{
