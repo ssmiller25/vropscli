@@ -19,7 +19,8 @@ pipeline {
                     }
                     steps{
                         checkout scm
-                        bat '''C:\\Python37-32\\python.exe -m pip install --upgrade pip
+                        bat '''path
+                        C:\\Python37-32\\python.exe -m pip install --upgrade pip
 
                         pip install pipenv
 
