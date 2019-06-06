@@ -27,6 +27,20 @@ pipeline {
                                 sh '''./artifacts/vropscli* --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'''
                             }
                         }
+                        stage('Downlaod oracle pack'){
+                            steps {
+                                sh '''wget https://s3.amazonaws.com/products.bluemedora.com/vrops_production_builds/oracle_database/1.2.0/OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
+                            }
+                        }
+                        stage('Install oracle pack'){
+                            steps {
+                                sh '''./artifacts/vropscli* \
+                                --user ${VROPSCLI_USER} \
+                                --password ${VROPSCLI_PASSWORD} \
+                                --host vropscli-ci.bluemedora.localnet \
+                                uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
+                            }
+                        }
                     }
                 }
                 stage ('Windows'){
