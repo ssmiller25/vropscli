@@ -6,42 +6,58 @@ pipeline {
         VROPSCLI_PASSWORD = credentials('vropscli_password')
     }
     stages {
-        stage('Run build script'){
+        stage('Run parallel scripts'){
             parallel{
-                stage('Run linux build script') {
+                stage ('Linux'){
                     agent {
                         label "linux && docker"
                     }
-                    steps {
-                        checkout scm
-                        sh '''./build.sh'''
+                    stage('Checkout SCM') {
+                        steps {
+                            checkout scm
+                        }
                     }
-                    steps {
-                        sh '''./artifacts/vropscli_linux_v$VERSION --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                    stage('Run linux build script') {
+                        steps {
+                            sh '''./build.sh'''
+                        }
+                    }
+                    stage('Test linux build commands') {
+                        steps {
+                            sh '''./artifacts/vropscli_linux_v$VERSION --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                        }
                     }
                 }
-                stage ('Run windows build script'){
+                stage ('Windows'){
                     agent {
                         label "windows"
                     }
-                    steps{
-                        checkout scm
-                        bat '''python -m pip install --upgrade pip
-
-                        pip install pipenv
-
-                        pipenv --python 3.7
-                        pipenv lock --pre
-                        pipenv sync
-
-                        pipenv install pyinstaller
-                        pipenv run pyinstaller -F vropscli.py'''
+                    stage('Checkout SCM') {
+                        steps {
+                            checkout scm
+                        }
                     }
-                    steps {
-                        bat '''dist\\vropscli --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                    stage('Run windows build script') {
+                        steps {
+                            bat '''python -m pip install --upgrade pip
+
+                            pip install pipenv
+
+                            pipenv --python 3.7
+                            pipenv lock --pre
+                            pipenv sync
+
+                            pipenv install pyinstaller
+                            pipenv run pyinstaller -F vropscli.py'''
+                        }
                     }
-                }
+                    stage('Test windows build commands') {
+                        steps {
+                            bat '''dist\\vropscli --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                        }
+                    }
+                }           
             }
-	}
+        }
     }
-} 
+}
