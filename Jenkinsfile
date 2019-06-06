@@ -20,7 +20,7 @@ pipeline {
                     steps{
                         checkout scm
                         bat '''path
-                        C:\\Python37-32\\python.exe -m pip install --upgrade pip
+                        python -m pip install --upgrade pip
 
                         pip install pipenv
 
@@ -29,7 +29,7 @@ pipeline {
                         pipenv sync
 
                         pipenv install pyinstaller
-                        pipenv run pyinstaller -F vropscaali.py'''
+                        pipenv run pyinstaller -F vropscli.py'''
 
                     }
                 }
