@@ -55,7 +55,7 @@ pipeline {
                         }
                         stage('Test windows build commands') {
                             steps {
-                                bat '''dist\\vropscli --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'''
+                                bat '''dist\\vropscli --user %VROPSCLI_USER% --password %VROPSCLI_PASSWORD% --host vropscli-ci.bluemedora.localnet'''
                             }
                         }
                     }
