@@ -8,52 +8,56 @@ pipeline {
     stages {
         stage('Run parallel scripts'){
             parallel{
-                stages ('Linux'){
+                stage ('Linux'){
                     agent {
                         label "linux && docker"
                     }
-                    stage('Checkout SCM') {
-                        steps {
-                            checkout scm
+                    stages{
+                        stage('Checkout SCM') {
+                            steps {
+                                checkout scm
+                            }
                         }
-                    }
-                    stage('Run linux build script') {
-                        steps {
-                            sh '''./build.sh'''
+                        stage('Run linux build script') {
+                            steps {
+                                sh '''./build.sh'''
+                            }
                         }
-                    }
-                    stage('Test linux build commands') {
-                        steps {
-                            sh '''./artifacts/vropscli_linux_v$VERSION --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                        stage('Test linux build commands') {
+                            steps {
+                                sh '''./artifacts/vropscli_linux_v$VERSION --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                            }
                         }
                     }
                 }
-                stages ('Windows'){
+                stage ('Windows'){
                     agent {
                         label "windows"
                     }
-                    stage('Checkout SCM') {
-                        steps {
-                            checkout scm
+                    stages {
+                        stage('Checkout SCM') {
+                            steps {
+                                checkout scm
+                            }
                         }
-                    }
-                    stage('Run windows build script') {
-                        steps {
-                            bat '''python -m pip install --upgrade pip
+                        stage('Run windows build script') {
+                            steps {
+                                bat '''python -m pip install --upgrade pip
 
-                            pip install pipenv
+                                pip install pipenv
 
-                            pipenv --python 3.7
-                            pipenv lock --pre
-                            pipenv sync
+                                pipenv --python 3.7
+                                pipenv lock --pre
+                                pipenv sync
 
-                            pipenv install pyinstaller
-                            pipenv run pyinstaller -F vropscli.py'''
+                                pipenv install pyinstaller
+                                pipenv run pyinstaller -F vropscli.py'''
+                            }
                         }
-                    }
-                    stage('Test windows build commands') {
-                        steps {
-                            bat '''dist\\vropscli --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                        stage('Test windows build commands') {
+                            steps {
+                                bat '''dist\\vropscli --user $VROPSCLI_USER --password VROPSCLI_PASSWORD --host vropscli-ci.bluemedora.localnet'''
+                            }
                         }
                     }
                 }           
