@@ -66,12 +66,12 @@ pipeline {
                                 'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter'
 
                                 if [ $?  == 0 ]
-                                then
-                                    echo "Solution id corrected"
-                                else
-                                    echo "Solution id incorrect"
-                                    exit 1
-                                fi
+                                    then
+                                        echo "Solution id corrected"
+                                    else
+                                        echo "Solution id incorrect"
+                                        exit 1
+                                    fi
                                 '''
                             }
                         }
@@ -93,7 +93,7 @@ pipeline {
                         stage('Get current licenses installed'){
                             steps {
                                 sh '''${artifact_path} getSolutionLicense OracleDatabase | \
-                                cut -b 19- | jq .[0].licenseKey | tr -d '"' | grep '${license}'
+                                cut -b 19- | jq .[0].licenseKey | tr -d '"' | grep ${license}
 
                                 if [ $?  == 0 ]
                                 then
