@@ -12,7 +12,7 @@ pipeline {
                         label "linux && docker"
                     }
                     environment {
-                            path = './artifacts/vropscli* --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'
+                            artifact_artifact_path = './artifacts/vropscli* --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'
                             license = "4/trialparticipant/06-06-2019-23:01:59/BM-VREALIZE-ORACLE-DB/enterprise/no-expiration/MP/accumulating/BM-VREALIZE-ORACLE-DB/50/2F90B289C5A81305CAB089F840118E01B0E77C59"
                         }
                     stages{
@@ -28,7 +28,7 @@ pipeline {
                         }
                         stage('Test linux build commands') {
                             steps {
-                                sh '''${path}'''
+                                sh '''${artifact_path}'''
                             }
                         }
                         stage('Downlaod oracle pack'){
@@ -38,7 +38,7 @@ pipeline {
                         }
                         stage('Install oracle pack'){
                             steps {
-                                sh '''${path} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
+                                sh '''${artifact_path} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
                             }
                         }
                         stage('Track install progress'){
@@ -49,7 +49,7 @@ pipeline {
                                 sh "SECONDS=0"
                                 sh '''while [ 1 ]
                                 do
-                                    ${path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false
+                                    ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false
 
                                     if [ echo $?  == 0 ]
                                     then
@@ -65,7 +65,7 @@ pipeline {
                         }
                         stage('Get solution id'){
                             steps {
-                                sh '''${path} getSolution | grep \
+                                sh '''${artifact_path} getSolution | grep \
                                 'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter'
 
                                 if [ echo $?  == 0 ]
@@ -80,7 +80,7 @@ pipeline {
                         }
                         stage('Set solution license') {
                             steps{
-                                sh '''${path} setSolutionLicense OracleDatabase ${license} | \
+                                sh '''${artifact_path} setSolutionLicense OracleDatabase ${license} | \
                                 xargs | grep 'license key installed True'
 
                                 if [ echo $?  == 0 ]
@@ -95,7 +95,7 @@ pipeline {
                         }
                         stage('Get current licenses installed'){
                             steps {
-                                sh '''${path} getSolutionLicense OracleDatabase | \
+                                sh '''${artifact_path} getSolutionLicense OracleDatabase | \
                                 cut -b 19- | jq .[0].licenseKey | tr -d '"' | grep '${license}'
 
                                 if [ echo $?  == 0 ]
