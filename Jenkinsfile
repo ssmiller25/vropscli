@@ -49,7 +49,7 @@ pipeline {
                                 sh "SECONDS=0"
                                 sh '''while [ 1 ]
                                 do
-                                    ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false
+                                    ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false'
 
                                     if [ echo $?  == 0 ]
                                     then
