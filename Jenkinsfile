@@ -97,7 +97,7 @@ pipeline {
                         stage('Get current licenses installed'){
                             steps {
                                 sh '''${path} getSolutionLicense OracleDatabase | \
-                                cut -b 19- | jq .[0].licenseKey | tr -d '"' \| grep '${license}'
+                                cut -b 19- | jq .[0].licenseKey | tr -d '"' | grep '${license}'
 
                                 if [ echo $?  == 0 ]
                                 then
