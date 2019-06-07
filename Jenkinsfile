@@ -41,7 +41,6 @@ pipeline {
                                 sh '''${path} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
                             }
                         }
-4/trialparticipant/06-06-2019-23:01:59/BM-VREALIZE-ORACLE-DB/enterprise/no-expiration/MP/accumulating/BM-VREALIZE-ORACLE-DB/50/2F90B289C5A81305CAB089F840118E01B0E77C59
                         stage('Install oracle pack'){
                             steps {
                                 sh '''${path} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
