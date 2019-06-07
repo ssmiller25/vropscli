@@ -51,7 +51,7 @@ pipeline {
                                 do
                                     ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false'
 
-                                    if [ echo $?  == 0 ]
+                                    if [ $?  == 0 ]
                                     then
                                         echo "Install finished, or have never started"
                                         timer = 1
@@ -69,7 +69,7 @@ pipeline {
                                 sh '''${artifact_path} getSolution | grep \
                                 'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter'
 
-                                if [ echo $?  == 0 ]
+                                if [ $?  == 0 ]
                                     then
                                         echo "Solution id corrected"
                                     else
@@ -84,7 +84,7 @@ pipeline {
                                 sh '''${artifact_path} setSolutionLicense OracleDatabase ${license} | \
                                 xargs | grep 'license key installed True'
 
-                                if [ echo $?  == 0 ]
+                                if [ $?  == 0 ]
                                 then
                                     echo "License Key install success"
                                 else
@@ -99,7 +99,7 @@ pipeline {
                                 sh '''${artifact_path} getSolutionLicense OracleDatabase | \
                                 cut -b 19- | jq .[0].licenseKey | tr -d '"' | grep '${license}'
 
-                                if [ echo $?  == 0 ]
+                                if [ $?  == 0 ]
                                 then
                                     echo "License Key correct"
                                 else
