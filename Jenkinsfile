@@ -46,15 +46,15 @@ pipeline {
                                 // Tacking if install finished
                                 // If overtime, timeout
                                 // #!/bin/bash
-                                sh "SECONDS=0 && timer=0"
-                                sh '''while [ timer=0 ]
+                                sh "SECONDS=0"
+                                sh '''while [ 1 ]
                                 do
                                     ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false'
 
                                     if [ $?  == 0 ]
                                     then
                                         echo "Install finished, or have never started"
-                                        timer = 1
+                                        break
                                     elif [ $SECONDS -lt > 1800 ]
                                     then
                                         echo "30 Miniues has passed, the install is taking too long"
