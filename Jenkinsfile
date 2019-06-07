@@ -12,7 +12,7 @@ pipeline {
                         label "linux && docker"
                     }
                     environment {
-                            artifact_artifact_path = './artifacts/vropscli* --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'
+                            artifact_path = "./artifacts/vropscli* --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet"
                             license = "4/trialparticipant/06-06-2019-23:01:59/BM-VREALIZE-ORACLE-DB/enterprise/no-expiration/MP/accumulating/BM-VREALIZE-ORACLE-DB/50/2F90B289C5A81305CAB089F840118E01B0E77C59"
                         }
                     stages{
