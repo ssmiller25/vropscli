@@ -51,7 +51,7 @@ pipeline {
                                 do
                                     ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false' && break
 
-                                    if [ $SECONDS -lt > 1800 ]
+                                if [ $SECONDS -lt > 1800 ]
                                     then
                                         echo "30 Miniues has passed, the install is taking too long"
                                         exit 1
@@ -63,22 +63,45 @@ pipeline {
                         stage('Get solution id'){
                             steps {
                                 sh '''${artifact_path} getSolution | grep \
-                                'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter' || \
-                                echo "Solution id incorrect" && exit 1
+                                'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter'
+
+                                if [ $?  == 0 ]
+                                then
+                                    echo "Solution id corrected"
+                                else
+                                    echo "Solution id incorrect"
+                                    exit 1
+                                fi
                                 '''
                             }
                         }
                         stage('Set solution license') {
                             steps{
-                                sh '''${artifact_path} setSolutionLicense OracleDatabase ${license} | xargs \
-                                | grep 'license key installed True' || echo "License Key install error" && exit 1
+                                sh '''${artifact_path} setSolutionLicense OracleDatabase ${license} | \
+                                xargs | grep 'license key installed True'
+
+                                if [ $?  == 0 ]
+                                then
+                                    echo "License Key install success"
+                                else
+                                    echo "License Key install error"
+                                    exit 1
+                                fi
                                 '''
                             }
                         }
                         stage('Get current licenses installed'){
                             steps {
-                                sh '''${artifact_path} getSolutionLicense OracleDatabase | cut -b 19- | jq .[0].licenseKey \
-                                | tr -d '"' | grep '${license}' || echo "License Key incorrect" && exit 1
+                                sh '''${artifact_path} getSolutionLicense OracleDatabase | \
+                                cut -b 19- | jq .[0].licenseKey | tr -d '"' | grep '${license}'
+
+                                if [ $?  == 0 ]
+                                then
+                                    echo "License Key correct"
+                                else
+                                    echo "License Key incorrect"
+                                    exit 1
+                                fi
                                 '''
                             }
                         }
