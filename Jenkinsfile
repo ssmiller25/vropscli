@@ -13,7 +13,7 @@ pipeline {
                     }
                     environment {
                             artifact_path = "./artifacts/vropscli* --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet"
-                            license = "4/trialparticipant/06-06-2019-23:01:59/BM-VREALIZE-ORACLE-DB/enterprise/no-expiration/MP/accumulating/BM-VREALIZE-ORACLE-DB/50/2F90B289C5A81305CAB089F840118E01B0E77C59"
+                            license = credentials('vropscli_ci_license')
                         }
                     stages{
                         stage('Checkout SCM') {
@@ -46,20 +46,21 @@ pipeline {
                                 // Tacking if install finished
                                 // If overtime, timeout
                                 // #!/bin/bash
-                                sh "SECONDS=0"
-                                sh '''while [ 1 ]
+                                sh "SECONDS=0 && timer=0"
+                                sh '''while [ timer=0 ]
                                 do
                                     ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false'
 
                                     if [ echo $?  == 0 ]
                                     then
                                         echo "Install finished, or have never started"
-                                        done
+                                        timer = 1
                                     elif [ $SECONDS -lt > 1800 ]
                                     then
                                         echo "30 Miniues has passed, the install is taking too long"
                                         exit 1
                                     fi
+                                done
                                 '''
                             }
                         }
