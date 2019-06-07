@@ -11,11 +11,11 @@ pipeline {
                     agent {
                         label "linux && docker"
                     }
-                    stages{
-                        environment {
+                    environment {
                             path = './artifacts/vropscli* --user ${VROPSCLI_USER} --password ${VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'
                             license = "4/trialparticipant/06-06-2019-23:01:59/BM-VREALIZE-ORACLE-DB/enterprise/no-expiration/MP/accumulating/BM-VREALIZE-ORACLE-DB/50/2F90B289C5A81305CAB089F840118E01B0E77C59"
                         }
+                    stages{
                         stage('Checkout SCM') {
                             steps {
                                 checkout scm
@@ -41,43 +41,42 @@ pipeline {
                                 sh '''${path} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
                             }
                         }
-                        stage('Install oracle pack'){
+                        stage('Track install progress'){
                             steps {
-                                sh '''${path} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
+                                // Tacking if install finished
+                                // If overtime, timeout
+                                // #!/bin/bash
+                                sh "SECONDS=0"
+                                sh '''while [ 1 ]
+                                do
+                                    ${path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false
+
+                                    if [ echo $?  == 0 ]
+                                    then
+                                        echo "Install finished, or have never started"
+                                        done
+                                    elif [ $SECONDS -lt > 1800 ]
+                                    then
+                                        echo "30 Miniues has passed, the install is taking too long"
+                                        exit 1
+                                    fi
+                                '''
                             }
                         }
-                        stage('Track install progress'){
-                            // Tacking if install finished
-                            // If overtime, timeout
-                            // #!/bin/bash
-                            sh "SECONDS=0"
-                            sh '''while [ 1 ]
-                            do
-                                ${path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false
+                        stage('Get solution id'){
+                            steps {
+                                sh '''${path} getSolution | grep \
+                                'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter'
 
                                 if [ echo $?  == 0 ]
-                                then
-                                    echo "Install finished, or have never started"
-                                    done
-                                elif [ $SECONDS -lt > 1800 ]
-                                then
-                                    echo "30 Miniues has passed, the install is taking too long"
-                                    exit 1
-                                fi
-                            '''
-                        }
-                        stage('Get solution id'){
-                            sh '''${path} getSolution | grep \
-                            'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter'
-
-                            if [ echo $?  == 0 ]
-                                then
-                                    echo "Solution id corrected"
-                                else
-                                    echo "Solution id incorrect"
-                                    exit 1
-                                fi
-                            '''
+                                    then
+                                        echo "Solution id corrected"
+                                    else
+                                        echo "Solution id incorrect"
+                                        exit 1
+                                    fi
+                                '''
+                            }
                         }
                         stage('Set solution license') {
                             steps{
