@@ -111,7 +111,7 @@ pipeline {
                                 // Get the first adapter
                                 adapter = sh (
                                     script: '${artifact_path_and_creds} getAdapters \
-                                | sed '1d' | sort | sed -n 1p', 
+                                | sed "1d" | sort | sed -n 1p', 
                                     returnStdout: true
                                 ).trim()
                             }
