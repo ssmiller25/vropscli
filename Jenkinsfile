@@ -235,7 +235,8 @@ pipeline {
                         stage('Run mac build script') {
                             steps {
                                 sh '''curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-                                python get-pip.py
+                                python get-pip.py --user
+                                export PATH=$PATH:~/Library/Python/2.7/bin/
                                 pip install -U pip
 
                                 pip install pipenv
