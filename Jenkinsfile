@@ -109,9 +109,9 @@ pipeline {
                         stage('Get adapter instance'){
                             steps {
                                 // Get the first adapter
-                                ${env.adapter} = sh (
-                                    script: '''adapter=`${artifact_path_and_creds} getAdapters \
-                                | sed '1d' | sort | sed -n 1p`''', 
+                                adapter = sh (
+                                    script: '''${artifact_path_and_creds} getAdapters \
+                                | sed '1d' | sort | sed -n 1p''', 
                                     returnStdout: true
                                 ).trim()
                             }
