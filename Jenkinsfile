@@ -110,7 +110,7 @@ pipeline {
                             steps {
                                 // Get the first adapter
                                 script {
-                                    adapter = sh (
+                                    ${env.adapter} = sh (
                                         script: '${artifact_path_and_creds} getAdapters \
                                         | sed "1d" | sort | sed -n 1p', 
                                             returnStdout: true
