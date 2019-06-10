@@ -239,7 +239,7 @@ pipeline {
                                 export PATH=$PATH:~/Library/Python/2.7/bin/
                                 pip install -U pip
 
-                                pip install pipenv
+                                pip install --user pipenv
 
                                 pipenv --python 3.7
                                 pipenv lock --pre
