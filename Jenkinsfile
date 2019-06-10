@@ -187,7 +187,6 @@ pipeline {
                             steps {
                                 sh '''${artifact_path_and_creds} getAdapterKinds'''
                             }
-                            }
                         }
 
                         
