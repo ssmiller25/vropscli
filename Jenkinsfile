@@ -189,8 +189,6 @@ pipeline {
                             }
                         }
 
-                        
-
                     }
                 }
                 stage ('Windows'){
@@ -223,7 +221,38 @@ pipeline {
                             }
                         }
                     }
-                }           
+                }         
+                stage ('Mac'){
+                    agent {
+                        label "mac"
+                    }
+                    stages {
+                        stage('Checkout SCM') {
+                            steps {
+                                checkout scm
+                            }
+                        }
+                        stage('Run mac build script') {
+                            steps {
+                                sh '''python3 -m pip3 install --upgrade pip3
+
+                                pip3 install pipenv
+
+                                pipenv --python 3.7
+                                pipenv lock --pre
+                                pipenv sync
+
+                                pipenv install pyinstaller
+                                pipenv run pyinstaller -F vropscli.py'''
+                            }
+                        }
+                        stage('Test mac build commands') {
+                            steps {
+                                sh '''./dist/vropscli --user %VROPSCLI_USER% --password %VROPSCLI_PASSWORD% --host vropscli-ci.bluemedora.localnet'''
+                            }
+                        }
+                    }
+                }             
             }
         }
     }
