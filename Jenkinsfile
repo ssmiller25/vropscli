@@ -14,7 +14,6 @@ pipeline {
                     environment {
                             artifact_path_and_creds = "./artifacts/vropscli* --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet"
                             license = credentials('vropscli_ci_license')
-                            //adapter = ''
                         }
                     stages{
                         stage('Checkout SCM') {
@@ -172,6 +171,22 @@ pipeline {
                                     fi
                                 done
                                 '''
+                            }
+                        }
+                        stage('Get all credentials'){
+                            steps {
+                                sh '''${artifact_path_and_creds} getAllCredentials'''
+                            }
+                        }
+                        stage('Get collectors'){
+                            steps {
+                                sh '''${artifact_path_and_creds} getCollectors'''
+                            }
+                        }
+                        stage('Get adapter kinds'){
+                            steps {
+                                sh '''${artifact_path_and_creds} getAdapterKinds'''
+                            }
                             }
                         }
 
