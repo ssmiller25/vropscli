@@ -12,8 +12,9 @@ pipeline {
                         label "linux && docker"
                     }
                     environment {
-                            artifact_path = "./artifacts/vropscli* --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet"
+                            artifact_path_and_creds_and_creds = "./artifacts/vropscli* --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet"
                             license = credentials('vropscli_ci_license')
+                            adapter = ''
                         }
                     stages{
                         stage('Checkout SCM') {
@@ -28,7 +29,7 @@ pipeline {
                         }
                         stage('Test linux build commands') {
                             steps {
-                                sh '''${artifact_path}'''
+                                sh '''${artifact_path_and_creds}'''
                             }
                         }
                         stage('Downlaod oracle pack'){
@@ -38,7 +39,7 @@ pipeline {
                         }
                         stage('Install oracle pack'){
                             steps {
-                                sh '''${artifact_path} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
+                                sh '''${artifact_path_and_creds} uploadPak OracleDatabase-6.3_1.2.0_b20180319.144115.pak'''
                             }
                         }
                         stage('Track install progress'){
@@ -46,12 +47,12 @@ pipeline {
                                 // Tacking if install finished
                                 // If overtime, timeout
                                 // #!/bin/bash
-                                sh "SECONDS=0"
-                                sh '''while [ 1 ]
+                                sh '''SECONDS=0
+                                while [ 1 ]
                                 do
-                                    ${artifact_path} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false' && break
+                                    ${artifact_path_and_creds} getCurrentActivity | grep 'is_upgrade_orchestrator_active:          false' && break
 
-                                if [ $SECONDS -lt > 1800 ]
+                                if [ $SECONDS -gt 1800 ]
                                     then
                                         echo "30 Miniues has passed, the install is taking too long"
                                         exit 1
@@ -62,7 +63,7 @@ pipeline {
                         }
                         stage('Get solution id'){
                             steps {
-                                sh '''${artifact_path} getSolution | grep \
+                                sh '''${artifact_path_and_creds} getSolution | grep \
                                 'OracleDatabase,Oracle Database,1.2.0.20180319.144115,OracleDBAdapter'
 
                                 if [ $?  == 0 ]
@@ -77,7 +78,7 @@ pipeline {
                         }
                         stage('Set solution license') {
                             steps{
-                                sh '''${artifact_path} setSolutionLicense OracleDatabase ${license} | \
+                                sh '''${artifact_path_and_creds} setSolutionLicense OracleDatabase ${license} | \
                                 xargs | grep 'license key installed True'
 
                                 if [ $?  == 0 ]
@@ -92,7 +93,7 @@ pipeline {
                         }
                         stage('Get current licenses installed'){
                             steps {
-                                sh '''${artifact_path} getSolutionLicense OracleDatabase | \
+                                sh '''${artifact_path_and_creds} getSolutionLicense OracleDatabase | \
                                 cut -b 19- | jq .[0].licenseKey | tr -d '"' | grep ${license}
 
                                 if [ $?  == 0 ]
@@ -105,7 +106,79 @@ pipeline {
                                 '''
                             }
                         }
+                        stage('Get adapter instance'){
+                            steps {
+                                // Get the first adapter
+                                sh '''${adapter}=`${artifact_path_and_creds} getAdapters | sed -n 2p`
 
+                                if [ $?  == 0 ]
+                                then
+                                    echo "Adapter found"
+                                else
+                                    echo "Adapter not found"
+                                    exit 1
+                                fi
+                                '''
+                            }
+                        }
+                        stage('Stop adapter instance'){
+                            steps {
+                                sh '''${artifact_path_and_creds} stopAdapterInstance ${adapter} \
+                                | grep 'Adapter Stopped'
+
+                                if [ $?  == 0 ]
+                                then
+                                    echo "Adapter stopped"
+                                else
+                                    echo "Error with stopping the adapter"
+                                    exit 1
+                                fi
+
+                                SECONDS=0
+                                while [ 1 ]
+                                do
+                                    ${artifact_path_and_creds} getAdapterCollectionStatus ${adapter} \
+                                    | grep 'The adapter is powered off' && break
+
+                                if [ $SECONDS -gt 60 ]
+                                    then
+                                        echo "The adapter is taking too long to stop"
+                                        exit 1
+                                    fi
+                                done
+                                '''
+                            }
+                        }
+                        stage('Start adapter instance'){
+                            steps {
+                                sh '''${artifact_path_and_creds} startAdapterInstance ${adapter} \
+                                | grep 'Adapter Started'
+
+                                if [ $?  == 0 ]
+                                then
+                                    echo "Adapter started"
+                                else
+                                    echo "Error with starting the adapter"
+                                    exit 1
+                                fi
+
+                                SECONDS=0
+                                while [ 1 ]
+                                do
+                                    ${artifact_path_and_creds} getAdapterCollectionStatus ${adapter} \
+                                    | grep 'The adapter is on' && break
+
+                                if [ $SECONDS -gt 120 ]
+                                    then
+                                        echo "The adapter is taking too long to start"
+                                        exit 1
+                                    fi
+                                done
+                                '''
+                            }
+                        }
+
+                        
 
                     }
                 }
