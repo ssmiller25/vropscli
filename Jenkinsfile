@@ -234,7 +234,9 @@ pipeline {
                         }
                         stage('Run mac build script') {
                             steps {
-                                sh '''python -m pip install --upgrade pip
+                                sh '''curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+                                python get-pip.py
+                                pip install -U pip
 
                                 pip install pipenv
 
