@@ -12,7 +12,7 @@ pipeline {
                         label "linux && docker"
                     }
                     environment {
-                            artifact_path_and_creds_and_creds = "./artifacts/vropscli* --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet"
+                            artifact_path_and_creds = "./artifacts/vropscli* --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet"
                             license = credentials('vropscli_ci_license')
                             adapter = ''
                         }
