@@ -111,8 +111,8 @@ pipeline {
                                 // Get the first adapter
                                 script {
                                     env.adapter = sh (
-                                        script: '${artifact_path_and_creds} getAdapters \
-                                        | sed '1d' | sort | sed -n 1p | tr ',' '\n' | sed -n 1p', 
+                                        script: "${artifact_path_and_creds} getAdapters \
+                                        | sed '1d' | sort | sed -n 1p | tr ',' '\n' | sed -n 1p", 
                                             returnStdout: true
                                     ).trim()
                                 } 
