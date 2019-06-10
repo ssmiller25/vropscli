@@ -109,8 +109,16 @@ pipeline {
                         stage('Get adapter instance'){
                             steps {
                                 // Get the first adapter
-                                sh '''${adapter}=`${artifact_path_and_creds} getAdapters | sed -n 2p`
-                                
+                                sh '''adapter=`${artifact_path_and_creds} getAdapters \
+                                | sed '1d' | sort | sed -n 1p`
+
+                                if [ $?  == 0 ]
+                                then
+                                    echo "Adapter found"
+                                else
+                                    echo "Adapter not found"
+                                    exit 1
+                                fi
                                 '''
                             }
                         }
