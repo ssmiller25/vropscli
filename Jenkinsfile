@@ -234,9 +234,9 @@ pipeline {
                         }
                         stage('Run mac build script') {
                             steps {
-                                sh '''python3 -m pip3 install --upgrade pip3
+                                sh '''python -m pip install --upgrade pip
 
-                                pip3 install pipenv
+                                pip install pipenv
 
                                 pipenv --python 3.7
                                 pipenv lock --pre
