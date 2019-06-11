@@ -233,13 +233,12 @@ pipeline {
                             }
                         }
                         stage('Run mac build script') {
+                            // Python 3.7.3
                             steps {
-                                sh '''curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-                                python get-pip.py --user
-                                export PATH=$PATH:~/Library/Python/2.7/bin/
-                                pip install --user -U pip
+                                sh '''
+                                pip3 install --upgrade pip
 
-                                pip install --user pipenv
+                                pi3 install pipenv
 
                                 pipenv --python 3.7
                                 pipenv lock --pre
@@ -257,6 +256,11 @@ pipeline {
                     }
                 }             
             }
+        }
+    }
+    post {
+        always {
+            deleteDir()
         }
     }
 }
