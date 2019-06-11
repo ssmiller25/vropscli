@@ -253,7 +253,7 @@ pipeline {
                         }
                         stage('Test mac build commands') {
                             steps {
-                                sh '''./dist/vropscli --user %VROPSCLI_USER% --password %VROPSCLI_PASSWORD% --host vropscli-ci.bluemedora.localnet'''
+                                sh '''./dist/vropscli --user ${env.VROPSCLI_USER} --password ${env.VROPSCLI_PASSWORD} --host vropscli-ci.bluemedora.localnet'''
                             }
                         }
                     }
