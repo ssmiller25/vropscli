@@ -226,6 +226,9 @@ pipeline {
                     agent {
                         label "mac"
                     }
+                    environment {
+                        PATH = "/Library/Frameworks/Python.framework/Versions/3.7/bin:$PATH"
+                    }
                     stages {
                         stage('Checkout SCM') {
                             steps {
@@ -238,7 +241,7 @@ pipeline {
                                 sh '''
                                 pip3 install --upgrade pip
 
-                                pi3 install pipenv
+                                pip3 install pipenv
 
                                 pipenv --python 3.7
                                 pipenv lock --pre
