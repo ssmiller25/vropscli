@@ -16,6 +16,11 @@ pipeline {
                             license = credentials('vropscli_ci_license')
                         }
                     stages{
+                        stage('Clean Directory') {
+                            steps {
+                                deleteDir()
+                            }
+                        }
                         stage('Checkout SCM') {
                             steps {
                                 checkout scm
@@ -196,6 +201,11 @@ pipeline {
                         label "windows"
                     }
                     stages {
+                        stage('Clean Directory') {
+                            steps {
+                                deleteDir()
+                            }
+                        }
                         stage('Checkout SCM') {
                             steps {
                                 checkout scm
@@ -230,6 +240,11 @@ pipeline {
                         PATH = "/Library/Frameworks/Python.framework/Versions/3.7/bin:$PATH"
                     }
                     stages {
+                        stage('Clean Directory') {
+                            steps {
+                                deleteDir()
+                            }
+                        }
                         stage('Checkout SCM') {
                             steps {
                                 checkout scm
@@ -259,11 +274,6 @@ pipeline {
                     }
                 }             
             }
-        }
-    }
-    post {
-        always {
-            cleanWs()
         }
     }
 }
