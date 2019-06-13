@@ -8,7 +8,7 @@ endpoint configuration, credential management, and more!  The design is focused 
 * Examples scripts that use the utilty are located in the [examples directory](https://github.com/BlueMedoraPublic/vropscli/tree/master/examples)
 * Blog articles
   * [Introducing vROpsCLI from Blue Medora](https://bluemedora.com/introducing-vropscli-from-blue-medora/)
-  * [Blue Medora vROpsCLI Tutorial Part One: Getting Started](https://bluemedora.com/blue-medora-vropscli-tutorial-part-one-getting-started/) 
+  * [Blue Medora vROpsCLI Tutorial Part One: Getting Started](https://bluemedora.com/blue-medora-vropscli-tutorial-part-one-getting-started/)
 
 # Development Environment Setup
 
@@ -28,14 +28,12 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 Make sure to compile this on the *oldest* OS you wish to support with your binary!
 
-* If you wish to compile to work natively on a vROps system (SLES 11), follow the direction in [vropsbuild.md](vropsbuild.md)
+* If you wish to compile to work natively on a vROps system (SLES 11), run the Docker build script:
 ```
-pipenv shell
-pipenv install pyinstaller
-pyinstaller -F vropscli.py
+./build.sh
 ```
 
-Binary build will be in a `dist` directory
+Binary build will be in a `artifacts` directory
 
 # Notes
 
