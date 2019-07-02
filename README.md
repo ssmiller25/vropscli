@@ -32,21 +32,26 @@ endpoint configuration, credential management, and more!  The design is focused 
 
 Make sure to compile this on the *oldest* OS you wish to support with your binary!
 
+
 * Run pylint tests
 
 ```sh
 pylint --disable=all --enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode *.py
 ```
 
-* If you wish to compile to work natively on a vROps system (SLES 11), follow the direction in [vropsbuild.md](vropsbuild.md)
-
+* Run installer locally
 ```sh
 pipenv shell
 pipenv install pyinstaller
 pyinstaller -F vropscli.py
+
+
+* If you wish to compile to work natively on a vROps system (SLES 11), run the Docker build script:
+```
+./build.sh
 ```
 
-Binary build will be in a `dist` directory
+Binary build will be in a `artifacts` directory
 
 ## Notes
 
