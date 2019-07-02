@@ -127,34 +127,6 @@ def get_status(host, password):
     else:
         return None
 
-def wait_for_casa(host, timeout=40):
-    '''
-    Returns true once the casa api returns a 401 (not authorized)
-    Casa will return a 500 if the api is not running yet
-
-    NOTE: vRops 6.3 tends to take 24 30 second iterations, while
-    other versions start casa on boot.
-    '''
-    url = 'https://' + host + '/casa/stats/adapters/cluster'
-    c = 0
-    while True:
-        c = c + 1
-        if c == timeout:
-            print('Timed out while waiting for casa to come online')
-            return False
-        try:
-            r = requests.get(url, verify=False)
-            if int(r.status_code) == 401:
-                print('Casa is online')
-                time.sleep(30) # CASA is online, but dont return right away
-                return True
-            else:
-                print('Waiting for casa to come online')
-                time.sleep(30)
-        except:
-            print('Exception when trying to GET ' + url)
-            return False
-
 def lookup_object_id_by_name(token, host, adapterType, objectType, objectName):
     '''
     Returns a tuple of (collection of vROps objects id's by name, whether this is a partial collection)
