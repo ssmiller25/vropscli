@@ -87,7 +87,7 @@ def getToken(conf):
             print('Return text: ')
             print(response.text)
             sys.exit(1)
-    except Exception as e:
+    except Exception:
         print('Error authenticating to vROPs system.  Check the passed hostname or parameters in .vropscli.yml')
         sys.exit(1)
 
@@ -117,7 +117,7 @@ def get_status(host, password):
     url = 'https://' + host + '/casa/sysadmin/slice/online_state'
     try:
         r = requests.get(url, headers=get_headers(), auth=requests.auth.HTTPBasicAuth('admin', password), verify=False)
-    except Exception as e:
+    except Exception:
         print('get_status() threw an exception')
         return None
 
@@ -146,11 +146,11 @@ def wait_for_casa(host, timeout=40):
             r = requests.get(url, verify=False)
             if int(r.status_code) == 401:
                 print('Casa is online')
-                sleep(30) # CASA is online, but dont return right away
+                time.sleep(30) # CASA is online, but dont return right away
                 return True
             else:
                 print('Waiting for casa to come online')
-                sleep(30)
+                time.sleep(30)
         except:
             print('Exception when trying to GET ' + url)
             return False

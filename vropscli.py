@@ -150,7 +150,6 @@ class vropscli:
 
         csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
 
-        settingsinfo = {}
         firstRun = 'true'
         response_parsed = json.loads(response.text)
 
@@ -462,7 +461,6 @@ class vropscli:
         url = "https://" + self.config['host'] + "/suite-api/api/credentials"
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
-        credssum = {}
         response_parsed = json.loads(response.text)
 
         csvheader=[]
@@ -699,7 +697,6 @@ class vropscli:
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             return json.loads(r.text)
-            return True
         else:
             r.raise_for_status()
 
@@ -754,7 +751,7 @@ class vropscli:
         '''
         # Get list of paks
         paks = []
-        for (dirpath, dirnames, filenames) in os.walk(pakDir):
+        for (_, _, filenames) in os.walk(pakDir):
             paks.extend(filenames)
         # Upload and install each pak
         for pak in paks:
@@ -787,7 +784,6 @@ class vropscli:
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             return json.loads(r.text)
-            return True
         else:
             print('Failed to Get Pak Info')
             r.raise_for_status()
@@ -802,7 +798,6 @@ class vropscli:
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             return json.loads(r.text)
-            return True
         else:
             r.raise_for_status()
 
@@ -862,7 +857,7 @@ class vropscli:
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/stop'
         #A put request to turn off the adapter
-        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Stopped")
 
     def startAdapterInstance(self, adapterId):
@@ -878,7 +873,7 @@ class vropscli:
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/start'
         #A put request to turn on the adapter
-        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
         print("Adapter Started")
 
     def createRelationshipsById(self, relationshipsFile):
@@ -1034,7 +1029,7 @@ class vropscli:
 
     def __init__(self, user=None, password=None, host=None):
         self.config = {}
-        requests.packages.urllib3.disable_warnings()
+        requests.urllib3.disable_warnings()
         if user and host:
             self.config['user'] = user
             self.config['host'] = host
