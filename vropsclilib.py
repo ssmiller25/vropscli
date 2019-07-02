@@ -87,7 +87,7 @@ def getToken(conf):
             print('Return text: ')
             print(response.text)
             sys.exit(1)
-    except Exception as e:
+    except Exception:
         print('Error authenticating to vROPs system.  Check the passed hostname or parameters in .vropscli.yml')
         sys.exit(1)
 
@@ -117,7 +117,7 @@ def get_status(host, password):
     url = 'https://' + host + '/casa/sysadmin/slice/online_state'
     try:
         r = requests.get(url, headers=get_headers(), auth=requests.auth.HTTPBasicAuth('admin', password), verify=False)
-    except Exception as e:
+    except Exception:
         print('get_status() threw an exception')
         return None
 
@@ -126,34 +126,6 @@ def get_status(host, password):
         return r.json()
     else:
         return None
-
-def wait_for_casa(host, timeout=40):
-    '''
-    Returns true once the casa api returns a 401 (not authorized)
-    Casa will return a 500 if the api is not running yet
-
-    NOTE: vRops 6.3 tends to take 24 30 second iterations, while
-    other versions start casa on boot.
-    '''
-    url = 'https://' + host + '/casa/stats/adapters/cluster'
-    c = 0
-    while True:
-        c = c + 1
-        if c == timeout:
-            print('Timed out while waiting for casa to come online')
-            return False
-        try:
-            r = requests.get(url, verify=False)
-            if int(r.status_code) == 401:
-                print('Casa is online')
-                sleep(30) # CASA is online, but dont return right away
-                return True
-            else:
-                print('Waiting for casa to come online')
-                sleep(30)
-        except:
-            print('Exception when trying to GET ' + url)
-            return False
 
 def lookup_object_id_by_name(token, host, adapterType, objectType, objectName):
     '''

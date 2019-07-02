@@ -5,6 +5,7 @@ name = "pypi"
 
 [dev-packages]
 pyinstaller = "*"
+pylint = "*"
 
 [packages]
 certifi = "==2018.1.18"
