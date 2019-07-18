@@ -40,14 +40,16 @@ pylint --disable=all --enable=F,E,unreachable,duplicate-key,unnecessary-semicolo
 ```
 
 * Run installer locally
+
 ```sh
 pipenv shell
 pipenv install pyinstaller
 pyinstaller -F vropscli.py
-
+```
 
 * If you wish to compile to work natively on a vROps system (SLES 11), run the Docker build script:
-```
+
+```sh
 ./build.sh
 ```
 
