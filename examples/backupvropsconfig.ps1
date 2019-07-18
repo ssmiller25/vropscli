@@ -15,11 +15,9 @@ if (Test-Path $env:USERPROFILE\.vropscli.yml) {
 }
 
 $components = ("getVropsLicense","getCurrentActivity","getAllCredentials","getSolution","getAdapters","getAdapterKinds")
-foreach ($component in $components)
-
-{
-write-host "----"$component"--------"
-.\vropscli.exe $component --user $user --password $password --host $node > $component"_"$time.csv
-write-host "----------------"
+foreach ($component in $components) {
+    write-host "----"$component"--------"
+    .\vropscli.exe $component --user $user --password $password --host $node > $component"_"$time.csv
+    write-host "----------------"
 }
 Write-host “-------Done------" 
