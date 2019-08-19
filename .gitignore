@@ -113,3 +113,6 @@ data
 
 # ssm - vscode specific folders
 .vscode
+
+# ignore builds from build script
+artifacts/
