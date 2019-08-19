@@ -857,7 +857,7 @@ class vropscli:
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/stop'
         #A put request to turn off the adapter
-        requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         print("Adapter Stopped")
 
     def startAdapterInstance(self, adapterId):
@@ -873,7 +873,7 @@ class vropscli:
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/start'
         #A put request to turn on the adapter
-        requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         print("Adapter Started")
 
     def createRelationshipsById(self, relationshipsFile):
