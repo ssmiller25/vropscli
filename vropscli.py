@@ -2,8 +2,8 @@
 
 # vropscli: Tool for interacting with vROps API from the command line
 # Copyright (c) 2018 Blue Medora LLC
-# This work is licensed under the terms of the MIT license.  
-#  For a copy, see <https://opensource.org/licenses/MIT>. 
+# This work is licensed under the terms of the MIT license.
+#  For a copy, see <https://opensource.org/licenses/MIT>.
 
 import vropsclilib as clilib
 import requests
@@ -14,7 +14,7 @@ import csv
 import sys
 import os
 import time
-import yaml 
+import yaml
 import traceback
 #from urllib3.exceptions import HTTPError
 from pathlib import Path
@@ -79,6 +79,20 @@ class vropscli:
         for instance in response_parsed["collector"]:
             print(instance["id"] + "," + instance["name"] + "," + instance["state"])
 
+    def getCollectorGroups(self):
+        '''->
+
+        Return all collector groups, including their ID
+
+        '''
+        url = "https://" + self.config['host'] + "/suite-api/api/collectorgroups"
+
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        print("id,Name,Collectors")
+        for instance in response_parsed["collectorGroups"]:
+            print(instance["id"] + "," + instance["name"] + "," + str(instance["collectorId"]))
+
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds"
         headers = {
@@ -108,24 +122,27 @@ class vropscli:
 
     def getAdapterConfig(self, adapterId):
         '''->
-        
+
         Return a CSV configuration for a single adapter
 
         ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getAdapters action
 
         '''
         adapterInfo = self.getAdapter(adapterId)
-        settingsinfo = {}
-        for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
-            settingsinfo[setting["identifierType"]["name"]]=setting["value"]
-        csvheader = []
+        # settingsinfo = {}
+        # for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
+        #     settingsinfo[setting["identifierType"]["name"]]=setting["value"]
         csvrow = {}
-        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","collectorGroupId","name","description"]
         csvrow["adapterkey"]=adapterInfo["id"]
         csvrow["adapterKind"]=adapterInfo["resourceKey"]["adapterKindKey"]
         csvrow["resourceKind"]=adapterInfo["resourceKey"]["resourceKindKey"]
         csvrow["credentialId"]=adapterInfo["credentialInstanceId"]
         csvrow["collectorId"]=adapterInfo["collectorId"]
+        csvrow["collectorGroupId"]=''
+        if "collectorGroupId" in adapterInfo:
+            csvrow["collectorId"]=''
+            csvrow["collectorGroupId"]=adapterInfo["collectorGroupId"]
         csvrow["name"]=adapterInfo["resourceKey"]["name"]
         csvrow["description"]=adapterInfo["description"]
 
@@ -179,7 +196,7 @@ class vropscli:
         Produce the JSON definition of all alert definition for a particular adapter kind
 
         ADAPTERKINDKEY: Adapter kind, which can be found by calling getAdapterKinds
-        
+
 
         '''
         url = "https://" + self.config['host'] + "/suite-api/api/alertdefinitions?adapterKind=" + adapterKindKey
@@ -315,20 +332,24 @@ class vropscli:
             resourceConfigItems = []
 
             for name, value in row.items():
-                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId') or (name == 'collectorGroupId'):
                     continue
                 resourceConfigItems.append({"name" : name, 'value':value})
 
             newadapterdata= {
                 "name": row['name'],
                 "description": row['description'],
-                "collectorId": row['collectorId'],
                 "adapterKindKey": row['adapterKind'],
                 "resourceIdentifiers": resourceConfigItems,
                 "credential": {
                     "id": row['credentialId']
                 }
             }
+            if len(row['collectorGroupId'].strip()):
+                newadapterdata['collectorGroupId'] = row['collectorGroupId']
+            else:
+                newadapterdata['collectorId'] = row['collectorId']
+
             url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
             r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
             if r.status_code < 300:
@@ -342,10 +363,10 @@ class vropscli:
                 except requests.exceptions.HTTPError as e:
                     error_data = json.loads(e.response.text)
                     if "Resource with same key already exists" in error_data["moreInformation"][1]["value"]:
-                        print("Adatper Instance " + row['name'] + "already exists, or shares resources marked unique with another adapter")
+                        print("Adatper Instance " + row['name'] + " already exists, or shares resources marked unique with another adapter")
                     else:
                         raise
-                    
+
 
 
     def deleteAdapterInstances(self, resourceConfigFile):
@@ -430,7 +451,7 @@ class vropscli:
 
     def setSolutionLicense(self, solutionId, license):
         '''->
-        
+
         Set solution license
 
         SOLUTIONID: Id of solution or string search for Solution type.  Id can be found from getSolution action
@@ -454,7 +475,7 @@ class vropscli:
 
     def getAllCredentials(self):
         '''->
-       
+
         Return all credentials defined in the vROps system
 
         '''
@@ -481,7 +502,7 @@ class vropscli:
 
     def getCredential(self, credentialId):
         '''->
-       
+
         Return an individual credential for vROps adapters, in CSV format.
 
         CREDENTIALID: The ID of the credential, or a string of the credential name
@@ -677,7 +698,7 @@ class vropscli:
                 print('Pak was already uploaded, but probably not installed')
                 print('Please finish the pak installation by calling vropscli installPak')
                 return None
-            elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]: 
+            elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]:
                 print('Failed to Install Pak')
                 print('Pak was already installed at the same or newer version')
                 print('If you wish to upgrade, please pass along --overwritePak to this function')
@@ -703,7 +724,7 @@ class vropscli:
     def installPak(self, pakId, force_content_update=True):
         '''->
 
-        Install an uploaded Pak File.  
+        Install an uploaded Pak File.
 
         PAKID:  The ID of the pak file, produced when uploadPak is executed.
         FORCE_CONTENT_UPDATE:  Will overwrite included dashboards, reports, and alert definitions.  Default is true
@@ -711,7 +732,7 @@ class vropscli:
         '''
         install_data = {}
         if force_content_update == True:
-            install_data['force_content_update'] = True 
+            install_data['force_content_update'] = True
         else:
             install_data['force_content_update'] = False
         url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/information'
@@ -721,7 +742,7 @@ class vropscli:
         else:
             return "Invalid pakId. Get the pak_information attribute in Upload pak command response"
 
-        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install' 
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install'
         r = requests.post(url, headers=clilib.get_headers_plain(), data=json.dumps(install_data), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
@@ -742,7 +763,7 @@ class vropscli:
         '''->
 
         Install all pak files found in a directory
-        
+
         PAKDIR: The full path to the directory that contains the PAK files
         OVERWRITEPAK: Overwrite existing packs, default to false.
         FORCE_CONTENT_UPDATE: Will overwrite included build-in dashboards, reports, and alert definitions.  Default is true.
@@ -775,7 +796,7 @@ class vropscli:
     def getPakStatus(self, pakID):
         '''->
 
-        Get Pak Installation Status 
+        Get Pak Installation Status
 
         PAKID:  The ID of the pak file, produced when uploadPak is executed.
 
@@ -917,7 +938,7 @@ class vropscli:
 
         Create resource relationships from a file
 
-        RELATIONSHIPSFILE:  CSV file of alerts to create. The columns are: 
+        RELATIONSHIPSFILE:  CSV file of alerts to create. The columns are:
           * Parent Adapter Type ("VMWARE" for example, for vCenter adapters -- Use the getAdapters verb to list adapter types in your environment)
           * Parent Object Type ("VirtualMachine" for example, for VM's)
           * Parent Object Name
@@ -984,7 +1005,7 @@ class vropscli:
                         print()
                     else:
                         successCount += len(childUUIDs)
-            
+
             if (successCount > 0):
                 print(f"{successCount} relationships successfully created.")
             else:
@@ -994,7 +1015,7 @@ class vropscli:
         '''->
 
         Save Credentials to a local file, $HOME/.vropscli.yml
-        WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to 
+        WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to
         your vROps system!!!
 
         Make sure to pass:
@@ -1020,8 +1041,8 @@ class vropscli:
         print("Blue Medora vROpsCLI")
         print("Version " + VERSION)
         print("Copyright (c) 2018 Blue Medora LLC")
-        print("This work is licensed under the terms of the MIT license.") 
-        print("For a copy, see <https://opensource.org/licenses/MIT>.") 
+        print("This work is licensed under the terms of the MIT license.")
+        print("For a copy, see <https://opensource.org/licenses/MIT>.")
         print("")
         print("For more information on Blue Medora, contact sales@bluemedora.com")
         print("For technical assistance with this utility, contact devops@bluemedora.com")
@@ -1070,9 +1091,9 @@ if __name__ == '__main__':
   except Exception as e:
     if verbose==True:
         print("Error: " + str(e))
-        traceback.print_exc()       
+        traceback.print_exc()
     else:
         print("Error: " + str(e))
         print("Pass the -v flag for more verbose error messages")
-    
-  
+
+
