@@ -203,7 +203,12 @@ class vropscli:
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
-        print("{\"alertDefinitions\": " + json.dumps(response_parsed["alertDefinitions"]) + "}")
+
+        # Creating data structure that getAlertsDefinitionByAdapterKind will like
+        responseformatted = {}
+        responseformatted["alertDefinitions"] = response_parsed["alertDefinitions"]
+
+        print(json.dumps(responseformatted, indent=2))
 
     def updateAlertDefinitions(self, alertConfigFile):
         '''->
