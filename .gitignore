@@ -111,6 +111,9 @@ data
 *pak
 *csv
 
+# VLCode inclusions
+.settings.json
+
 # ssm - vscode specific folders
 .vscode
 

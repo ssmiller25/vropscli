@@ -826,6 +826,43 @@ class vropscli:
             return json.loads(r.text)
         else:
             r.raise_for_status()
+    def setResourceForMaintenance(self, resourceId, mode, duration, end):
+        '''->
+
+        Put the specific Resource in Maintenance.
+        The Resource can end up in two maintenance states - MAINTAINED OR MAINTAINED_MANUAL - depending upon the inputs specified.
+        ResourceId - Id of the resource in UUID format
+        Mode - MAINTAINED or MAINTAINED_MANUAL
+        If MAINTAINED, set duration or end time
+        '''
+        input_data = {}
+        if mode == "MAINTAINED_MANUAL":
+            print("In MAINTAINED_MANUAL")
+            input_data = {
+                'id': resourceId
+            }
+            print(input_data)
+        else:
+            if end:
+                input_data = {
+                    'id': resourceId,
+                    'end': end
+                }
+                print(input_data)
+            else:
+                input_data = {
+                    'id': resourceId,
+                    'duration': duration
+                }
+                print(input_data)
+        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + str(resourceId) + '/maintained'
+        r = requests.request("PUT", url, data=json.dumps(input_data),
+                             headers=clilib.get_token_header(self.token['token']), verify=False)
+        if r.status_code < 300:
+            return "success"
+        else:
+            print(r.text)
+            r.raise_for_status()
 
     def getAdapterCollectionStatus(self, adapterId):
         '''->
