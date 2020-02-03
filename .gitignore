@@ -113,3 +113,9 @@ data
 
 # VLCode inclusions
 .settings.json
+
+# ssm - vscode specific folders
+.vscode
+
+# ignore builds from build script
+artifacts/

@@ -13,7 +13,7 @@ import time
 import json
 import base64
 from math import ceil
-from yaml import load,dump
+from yaml import load,dump,FullLoader
 from sys import exit
 from os import path
 from pathlib import Path
@@ -46,7 +46,7 @@ def getConfig():
     '''
     configfile=path.join(str(Path.home()), ".vropscli.yml")
     with open(path.expanduser(configfile),"r") as c:
-        config = load(c)
+        config = load(c, Loader=FullLoader)
     # Test for encrypted password, and if not then add it.
     for sectionkey,section in config.items():
         if not "passencrypt" in section:
@@ -83,11 +83,11 @@ def getToken(conf):
         if response.status_code < 300:
             return json.loads(response.text)
         else:
-            print('Return code: ' + str(r.status_code))
+            print('Return code: ' + str(response.status_code))
             print('Return text: ')
-            print(r.text)
+            print(response.text)
             sys.exit(1)
-    except Exception as e:
+    except Exception:
         print('Error authenticating to vROPs system.  Check the passed hostname or parameters in .vropscli.yml')
         sys.exit(1)
 
@@ -117,7 +117,7 @@ def get_status(host, password):
     url = 'https://' + host + '/casa/sysadmin/slice/online_state'
     try:
         r = requests.get(url, headers=get_headers(), auth=requests.auth.HTTPBasicAuth('admin', password), verify=False)
-    except Exception as e:
+    except Exception:
         print('get_status() threw an exception')
         return None
 
@@ -127,30 +127,42 @@ def get_status(host, password):
     else:
         return None
 
-def wait_for_casa(host, timeout=40):
+def lookup_object_id_by_name(token, host, adapterType, objectType, objectName):
     '''
-    Returns true once the casa api returns a 401 (not authorized)
-    Casa will return a 500 if the api is not running yet
+    Returns a tuple of (collection of vROps objects id's by name, whether this is a partial collection)
+    A partial collection is returned if there are too many pages of objects from the API
+    '''
+    uuids = []
+    url = f"https://{host}/suite-api/api/adapterkinds/{adapterType}/resourcekinds/{objectType}/resources?name={objectName}"
+    pageLimit = 100
+    while (url != None and pageLimit > 0):
+        resp = requests.get(url, headers=get_token_header(token), verify=False)
+        objData = json.loads(resp.text)
 
-    NOTE: vRops 6.3 tends to take 24 30 second iterations, while
-    other versions start casa on boot.
+        uuids.extend(map(lambda x: x["identifier"], objData["resourceList"]))
+
+        pageLimit -= 1
+
+        # If the results are paginated, there will be a "next" link
+        # Check if one exists, and if so, set that to be our next url; otherwise set to None
+        nextHref = next((x["href"] for x in objData["links"] if x["name"] == "next"), None)
+        if nextHref is None:
+            url = None
+        else:
+            url = f"https://{host}{nextHref}"
+
+    # In practice, hitting the pageLimit should almost never happen, and is almost certainly an error
+    # We only check the pageLimit as a stopgap to prevent infinite loops
+    return (uuids, pageLimit == 0)
+
+def create_relationships_by_ids(token, host, parentUuid, childUuids):
     '''
-    url = 'https://' + host + '/casa/stats/adapters/cluster'
-    c = 0
-    while True:
-        c = c + 1
-        if c == timeout:
-            print('Timed out while waiting for casa to come online')
-            return False
-        try:
-            r = requests.get(url, verify=False)
-            if int(r.status_code) == 401:
-                print('Casa is online')
-                sleep(30) # CASA is online, but dont return right away
-                return True
-            else:
-                print('Waiting for casa to come online')
-                sleep(30)
-        except:
-            print('Exception when trying to GET ' + url)
-            return False
+    Adds a relationship between objects identified by UUID
+    Returns a tuple of (success flag, response object)
+    '''
+    url = f"https://{host}/suite-api/api/resources/{parentUuid}/relationships/CHILD"
+    reqBody = json.dumps({"uuids": childUuids})
+
+    r = requests.post(url, data=reqBody, headers=get_token_header(token), verify=False)
+
+    return (r.status_code == 204, r)
