@@ -21,7 +21,7 @@ from pathlib import Path
 import getpass
 
 
-VERSION="1.2.2"
+VERSION="1.3.0"
 
 class vropscli:
 
@@ -1141,5 +1141,3 @@ if __name__ == '__main__':
     else:
         print("Error: " + str(e))
         print("Pass the -v flag for more verbose error messages")
-
-
