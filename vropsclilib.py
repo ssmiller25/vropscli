@@ -166,3 +166,21 @@ def create_relationships_by_ids(token, host, parentUuid, childUuids):
     r = requests.post(url, data=reqBody, headers=get_token_header(token), verify=False)
 
     return (r.status_code == 204, r)
+
+def upload_pak(host, username, password, pakFile, overwritePak):
+    '''
+    Uploads a pak file to the server.
+    Returns the API response object
+    '''
+
+    if overwritePak == True:
+        pak_handling_advice = 'CLOBBER'
+    else:
+        pak_handling_advice = 'STANDARD'
+    url = f'https://{host}/casa/upgrade/cluster/pak/reserved/operation/upload'
+    files = { 'contents': open(pakFile, 'rb') }
+    data = { 'pak_handling_advice': pak_handling_advice }
+
+    r = requests.post(url, data=data, files=files, auth=requests.auth.HTTPBasicAuth(username, password), verify=False)
+
+    return r
