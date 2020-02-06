@@ -2,8 +2,8 @@
 
 # vropscli: Tool for interacting with vROps API from the command line
 # Copyright (c) 2018 Blue Medora LLC
-# This work is licensed under the terms of the MIT license.  
-#  For a copy, see <https://opensource.org/licenses/MIT>. 
+# This work is licensed under the terms of the MIT license.
+#  For a copy, see <https://opensource.org/licenses/MIT>.
 
 import vropsclilib as clilib
 import requests
@@ -14,10 +14,11 @@ import csv
 import sys
 import os
 import time
-import yaml 
+import yaml
 import traceback
 #from urllib3.exceptions import HTTPError
 from pathlib import Path
+import getpass
 
 
 VERSION="1.2.2"
@@ -78,6 +79,20 @@ class vropscli:
         for instance in response_parsed["collector"]:
             print(instance["id"] + "," + instance["name"] + "," + instance["state"])
 
+    def getCollectorGroups(self):
+        '''->
+
+        Return all collector groups, including their ID
+
+        '''
+        url = "https://" + self.config['host'] + "/suite-api/api/collectorgroups"
+
+        response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
+        response_parsed = json.loads(response.text)
+        print("id,Name,Collectors")
+        for instance in response_parsed["collectorGroups"]:
+            print(instance["id"] + "," + instance["name"] + "," + str(instance["collectorId"]))
+
     def getAdapterKinds(self):
         url = "https://" + self.config['host'] + "/suite-api/api/adapterkinds"
         headers = {
@@ -107,24 +122,27 @@ class vropscli:
 
     def getAdapterConfig(self, adapterId):
         '''->
-        
+
         Return a CSV configuration for a single adapter
 
         ADAPTERID:  Id of solution or string search for the adapter name.  Id can be found from getAdapters action
 
         '''
         adapterInfo = self.getAdapter(adapterId)
-        settingsinfo = {}
-        for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
-            settingsinfo[setting["identifierType"]["name"]]=setting["value"]
-        csvheader = []
+        # settingsinfo = {}
+        # for setting in adapterInfo["resourceKey"]["resourceIdentifiers"]:
+        #     settingsinfo[setting["identifierType"]["name"]]=setting["value"]
         csvrow = {}
-        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
+        csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","collectorGroupId","name","description"]
         csvrow["adapterkey"]=adapterInfo["id"]
         csvrow["adapterKind"]=adapterInfo["resourceKey"]["adapterKindKey"]
         csvrow["resourceKind"]=adapterInfo["resourceKey"]["resourceKindKey"]
         csvrow["credentialId"]=adapterInfo["credentialInstanceId"]
         csvrow["collectorId"]=adapterInfo["collectorId"]
+        csvrow["collectorGroupId"]=''
+        if "collectorGroupId" in adapterInfo:
+            csvrow["collectorId"]=''
+            csvrow["collectorGroupId"]=adapterInfo["collectorGroupId"]
         csvrow["name"]=adapterInfo["resourceKey"]["name"]
         csvrow["description"]=adapterInfo["description"]
 
@@ -149,7 +167,6 @@ class vropscli:
 
         csvheader = ["adapterkey","adapterKind","resourceKind","credentialId","collectorId","name","description"]
 
-        settingsinfo = {}
         firstRun = 'true'
         response_parsed = json.loads(response.text)
 
@@ -179,14 +196,19 @@ class vropscli:
         Produce the JSON definition of all alert definition for a particular adapter kind
 
         ADAPTERKINDKEY: Adapter kind, which can be found by calling getAdapterKinds
-        
+
 
         '''
         url = "https://" + self.config['host'] + "/suite-api/api/alertdefinitions?adapterKind=" + adapterKindKey
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
         response_parsed = json.loads(response.text)
-        print("{\"alertDefinitions\": " + json.dumps(response_parsed["alertDefinitions"]) + "}")
+
+        # Creating data structure that getAlertsDefinitionByAdapterKind will like
+        responseformatted = {}
+        responseformatted["alertDefinitions"] = response_parsed["alertDefinitions"]
+
+        print(json.dumps(responseformatted, indent=2))
 
     def updateAlertDefinitions(self, alertConfigFile):
         '''->
@@ -315,20 +337,24 @@ class vropscli:
             resourceConfigItems = []
 
             for name, value in row.items():
-                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId'):
+                if (name == 'name') or (name == 'description') or (name == 'resourceKind') or (name == 'adapterKind') or (name == 'adapterkey') or (name == 'credentialId') or (name == 'collectorId') or (name == 'collectorGroupId'):
                     continue
                 resourceConfigItems.append({"name" : name, 'value':value})
 
             newadapterdata= {
                 "name": row['name'],
                 "description": row['description'],
-                "collectorId": row['collectorId'],
                 "adapterKindKey": row['adapterKind'],
                 "resourceIdentifiers": resourceConfigItems,
                 "credential": {
                     "id": row['credentialId']
                 }
             }
+            if len(row['collectorGroupId'].strip()):
+                newadapterdata['collectorGroupId'] = row['collectorGroupId']
+            else:
+                newadapterdata['collectorId'] = row['collectorId']
+
             url = 'https://' + self.config['host'] + '/suite-api/api/adapters'
             r = requests.post(url, data=json.dumps(newadapterdata), headers=clilib.get_token_header(self.token['token']), verify=False)
             if r.status_code < 300:
@@ -342,10 +368,10 @@ class vropscli:
                 except requests.exceptions.HTTPError as e:
                     error_data = json.loads(e.response.text)
                     if "Resource with same key already exists" in error_data["moreInformation"][1]["value"]:
-                        print("Adatper Instance " + row['name'] + "already exists, or shares resources marked unique with another adapter")
+                        print("Adatper Instance " + row['name'] + " already exists, or shares resources marked unique with another adapter")
                     else:
                         raise
-                    
+
 
 
     def deleteAdapterInstances(self, resourceConfigFile):
@@ -430,7 +456,7 @@ class vropscli:
 
     def setSolutionLicense(self, solutionId, license):
         '''->
-        
+
         Set solution license
 
         SOLUTIONID: Id of solution or string search for Solution type.  Id can be found from getSolution action
@@ -454,14 +480,13 @@ class vropscli:
 
     def getAllCredentials(self):
         '''->
-       
+
         Return all credentials defined in the vROps system
 
         '''
         url = "https://" + self.config['host'] + "/suite-api/api/credentials"
 
         response = requests.request("GET", url, headers=clilib.get_token_header(self.token['token']), verify=False)
-        credssum = {}
         response_parsed = json.loads(response.text)
 
         csvheader=[]
@@ -482,7 +507,7 @@ class vropscli:
 
     def getCredential(self, credentialId):
         '''->
-       
+
         Return an individual credential for vROps adapters, in CSV format.
 
         CREDENTIALID: The ID of the credential, or a string of the credential name
@@ -673,7 +698,7 @@ class vropscli:
                 print('Pak was already uploaded, but probably not installed')
                 print('Please finish the pak installation by calling vropscli installPak')
                 return None
-            elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]: 
+            elif "upgrade.pak.upload_version_older_or_same" in error_data["error_message_key"]:
                 print('Failed to Install Pak')
                 print('Pak was already installed at the same or newer version')
                 print('If you wish to upgrade, please pass along --overwritePak to this function')
@@ -693,14 +718,13 @@ class vropscli:
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             return json.loads(r.text)
-            return True
         else:
             r.raise_for_status()
 
     def installPak(self, pakId, force_content_update=True):
         '''->
 
-        Install an uploaded Pak File.  
+        Install an uploaded Pak File.
 
         PAKID:  The ID of the pak file, produced when uploadPak is executed.
         FORCE_CONTENT_UPDATE:  Will overwrite included dashboards, reports, and alert definitions.  Default is true
@@ -708,10 +732,17 @@ class vropscli:
         '''
         install_data = {}
         if force_content_update == True:
-            install_data['force_content_update'] = True 
+            install_data['force_content_update'] = True
         else:
-            install_data['force_content_update'] = False 
-        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install' 
+            install_data['force_content_update'] = False
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/information'
+        r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"], self.config["pass"]), verify=False)
+        if r.status_code < 300:
+            print("Valid pakId")
+        else:
+            return "Invalid pakId. Get the pak_information attribute in Upload pak command response"
+
+        url = 'https://' + self.config['host'] + '/casa/upgrade/cluster/pak/' + pakId + '/operation/install'
         r = requests.post(url, headers=clilib.get_headers_plain(), data=json.dumps(install_data), auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             print('Pak installation started.  Run "vropscli getCurrentActivity" to get current status')
@@ -732,7 +763,7 @@ class vropscli:
         '''->
 
         Install all pak files found in a directory
-        
+
         PAKDIR: The full path to the directory that contains the PAK files
         OVERWRITEPAK: Overwrite existing packs, default to false.
         FORCE_CONTENT_UPDATE: Will overwrite included build-in dashboards, reports, and alert definitions.  Default is true.
@@ -741,7 +772,7 @@ class vropscli:
         '''
         # Get list of paks
         paks = []
-        for (dirpath, dirnames, filenames) in os.walk(pakDir):
+        for (_, _, filenames) in os.walk(pakDir):
             paks.extend(filenames)
         # Upload and install each pak
         for pak in paks:
@@ -774,7 +805,7 @@ class vropscli:
     def getPakStatus(self, pakID):
         '''->
 
-        Get Pak Installation Status 
+        Get Pak Installation Status
 
         PAKID:  The ID of the pak file, produced when uploadPak is executed.
 
@@ -783,7 +814,6 @@ class vropscli:
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             return json.loads(r.text)
-            return True
         else:
             print('Failed to Get Pak Info')
             r.raise_for_status()
@@ -798,8 +828,44 @@ class vropscli:
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(self.config["user"],self.config["pass"]), verify=False)
         if r.status_code < 300:
             return json.loads(r.text)
-            return True
         else:
+            r.raise_for_status()
+    def setResourceForMaintenance(self, resourceId, mode, duration, end):
+        '''->
+
+        Put the specific Resource in Maintenance.
+        The Resource can end up in two maintenance states - MAINTAINED OR MAINTAINED_MANUAL - depending upon the inputs specified.
+        ResourceId - Id of the resource in UUID format
+        Mode - MAINTAINED or MAINTAINED_MANUAL
+        If MAINTAINED, set duration or end time
+        '''
+        input_data = {}
+        if mode == "MAINTAINED_MANUAL":
+            print("In MAINTAINED_MANUAL")
+            input_data = {
+                'id': resourceId
+            }
+            print(input_data)
+        else:
+            if end:
+                input_data = {
+                    'id': resourceId,
+                    'end': end
+                }
+                print(input_data)
+            else:
+                input_data = {
+                    'id': resourceId,
+                    'duration': duration
+                }
+                print(input_data)
+        url = 'https://' + self.config['host'] + '/suite-api/api/resources/' + str(resourceId) + '/maintained'
+        r = requests.request("PUT", url, data=json.dumps(input_data),
+                             headers=clilib.get_token_header(self.token['token']), verify=False)
+        if r.status_code < 300:
+            return "success"
+        else:
+            print(r.text)
             r.raise_for_status()
 
     def getAdapterCollectionStatus(self, adapterId):
@@ -858,7 +924,7 @@ class vropscli:
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/stop'
         #A put request to turn off the adapter
-        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         print("Adapter Stopped")
 
     def startAdapterInstance(self, adapterId):
@@ -874,14 +940,128 @@ class vropscli:
         #set the url for the adapter instance
         url = 'https://' + self.config['host'] + '/suite-api/api/adapters/' + adapter["id"] + '/monitoringstate/start'
         #A put request to turn on the adapter
-        r = requests.put(url, auth=requests.auth.HTTPBasicAuth(self.config['user'], self.config['pass']), verify=False)
+        requests.put(url, headers=clilib.get_token_header(self.token['token']), verify=False)
         print("Adapter Started")
+
+    def createRelationshipsById(self, relationshipsFile):
+        '''->
+
+        Create resource relationships from a file
+
+        RELATIONSHIPSFILE:  CSV file of alerts to create. The columns are:
+         * Parent UUID
+         * Child UUID
+
+         Do not include a header row.
+
+        '''
+
+        with open(relationshipsFile) as relationshipsCsv:
+            # The csv#DictReader iterates through the file as we process it, so the file needs to be left open
+            relationshipsData = csv.DictReader(relationshipsCsv, ['parent', 'child'])
+
+            successCount = 0
+
+            for relationshipRow in relationshipsData:
+                childUuids = [relationshipRow['child']] # TODO: Batch requests for relationships having the same parent for better performance
+                (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config['host'], relationshipRow['parent'], childUuids)
+
+                if (not success):
+                    print(f"Failed to create {relationshipRow['parent']} -> {relationshipRow['child']} relationship.")
+                    print(f"API Response Status Code: {r.status_code}")
+                    print(f"API Response Text: {r.text}")
+                    print()
+                else:
+                    successCount += 1
+
+            if (successCount > 0):
+                print(f"{successCount} relationships successfully created.")
+            else:
+                print('No relationships created.')
+
+    def createRelationshipsByName(self, relationshipsFile, matchMode = "first"):
+        '''->
+
+        Create resource relationships from a file
+
+        RELATIONSHIPSFILE:  CSV file of alerts to create. The columns are:
+          * Parent Adapter Type ("VMWARE" for example, for vCenter adapters -- Use the getAdapters verb to list adapter types in your environment)
+          * Parent Object Type ("VirtualMachine" for example, for VM's)
+          * Parent Object Name
+          * Child Adapter Type
+          * Child Object Type
+          * Child Object Name
+
+          Do not include a header row.
+
+          Example row:
+          VMWARE,VirtualMachine,agent-builder,VMWARE,VirtualMachine,3par-vsp
+
+        MATCHMODE: One of...
+          * first (default) - Make a relationship to the first object, even if there are multiple objects with that name
+          * all - Make relationships to every object found with that name
+          * skip - Skip (and log) whenever more than one object is found with that name
+
+          To match an object exactly, the createRelationshipsById verb can be used.
+          The matchmode is case-insensitive.
+
+        '''
+        lMatchMode = matchMode.lower()
+        if (lMatchMode not in ["first", "all", "skip"]):
+            print(f"Unknown matchMode <{matchMode}>. 'first', 'all', or 'skip' expected.")
+            return
+
+        with open(relationshipsFile) as relationshipsCsv:
+            # The csv#DictReader iterates through the file as we process it, so the file needs to be left open
+            relationshipsData = csv.DictReader(relationshipsCsv, ['parent-adapter', 'parent-type', 'parent-name', 'child-adapter', 'child-type', 'child-name'])
+
+            successCount = 0
+
+            for relationshipRow in relationshipsData:
+                (parentUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config['host'], relationshipRow['parent-adapter'], relationshipRow['parent-type'], relationshipRow['parent-name'])
+                (childUUIDs, _) = clilib.lookup_object_id_by_name(self.token['token'], self.config['host'], relationshipRow['child-adapter'], relationshipRow['child-type'], relationshipRow['child-name'])
+                # Ignoring the partial flag, since there's no reason we should return 100,000+ objects
+
+                if (len(parentUUIDs) == 0):
+                    print(f"No object found for {relationshipRow['parent-adapter']},{relationshipRow['parent-type']},{relationshipRow['parent-name']}. Skipping this relationship.")
+                    continue
+                if (len(childUUIDs) == 0):
+                    print(f"No object found for {relationshipRow['child-adapter']},{relationshipRow['child-type']},{relationshipRow['child-name']}. Skipping this relationship.")
+                    continue
+
+                if (lMatchMode == "skip"):
+                    if (len(parentUUIDs) != 1):
+                        print(f"Expected to find only one object for {relationshipRow['parent-adapter']},{relationshipRow['parent-type']},{relationshipRow['parent-name']}. {len(parentUUIDs)} found instead. Skipping this relationship.")
+                        continue
+                    if (len(childUUIDs) != 1):
+                        print(f"Expected to find only one object for {relationshipRow['child-adapter']},{relationshipRow['child-type']},{relationshipRow['child-name']}. {len(childUUIDs)} found instead. Skipping this relationship.")
+                        continue
+
+                if (lMatchMode == "first"):
+                    parentUUIDs = [parentUUIDs[0]]
+                    childUUIDs = [childUUIDs[0]]
+
+                for parentUUID in parentUUIDs:
+                    (success, r) = clilib.create_relationships_by_ids(self.token['token'], self.config['host'], parentUUID, childUUIDs)
+
+                    if (not success):
+                        print(f"Failed to create {parentUUID} -> {childUUIDs} relationship.")
+                        print(f"API Response Status Code: {r.status_code}")
+                        print(f"API Response Text: {r.text}")
+                        print()
+                    else:
+                        successCount += len(childUUIDs)
+
+            if (successCount > 0):
+                print(f"{successCount} relationships successfully created.")
+            else:
+                print('No relationships created.')
 
     def saveCliCred(self):
         '''->
 
         Save Credentials to a local file, $HOME/.vropscli.yml
-        WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to 
+        WARNING: This file should be protected with OS level permission.  ANYONE with this file will have credentials to
         your vROps system!!!
 
         Make sure to pass:
@@ -907,8 +1087,8 @@ class vropscli:
         print("Blue Medora vROpsCLI")
         print("Version " + VERSION)
         print("Copyright (c) 2018 Blue Medora LLC")
-        print("This work is licensed under the terms of the MIT license.") 
-        print("For a copy, see <https://opensource.org/licenses/MIT>.") 
+        print("This work is licensed under the terms of the MIT license.")
+        print("For a copy, see <https://opensource.org/licenses/MIT>.")
         print("")
         print("For more information on Blue Medora, contact sales@bluemedora.com")
         print("For technical assistance with this utility, contact devops@bluemedora.com")
@@ -916,11 +1096,14 @@ class vropscli:
 
     def __init__(self, user=None, password=None, host=None):
         self.config = {}
-        requests.packages.urllib3.disable_warnings()
-        if user and password and host:
+        requests.urllib3.disable_warnings()
+        if user and host:
             self.config['user'] = user
-            self.config['pass'] = password
             self.config['host'] = host
+            if password:
+                self.config['pass'] = password
+            else:
+                self.config['pass'] = getpass.getpass("Password: ")
             self.token=clilib.getToken(self.config)
         else:
             try:
@@ -954,9 +1137,9 @@ if __name__ == '__main__':
   except Exception as e:
     if verbose==True:
         print("Error: " + str(e))
-        traceback.print_exc()       
+        traceback.print_exc()
     else:
         print("Error: " + str(e))
         print("Pass the -v flag for more verbose error messages")
-    
-  
+
+

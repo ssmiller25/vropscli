@@ -210,7 +210,21 @@ removed from the csv.  You should leave the adapterKey blank.  Once complete, cr
     vropscli deleteCredential 00f3527f-8211-4d48-9278-cff871e3abf5
     ```
 
-## 10 - Error
+## 10 - Set resources for Maintenance
+
+Schedule a resource for maintenance
+
+```
+vropscli setResourceForMaintenance <UUID> <mode> <duration>|<end>
+```
+
+Mode can be "MAINTAINED" with a duration or end specificed, or "MAINTAINED_MANUAL".  If MAINTAINED_MANUAL is used,
+then the resource will have to be taken out of maintenance manually.
+
+Duration: specified in minutes
+End:  Time to end maintenance
+
+## Appendix - Details Errors
 
 Details errors can be produce by appending the "-v" flag to any command.  For example:
 ```

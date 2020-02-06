@@ -110,3 +110,12 @@ data
 # ssm - ignore and vrops pak and csv files
 *pak
 *csv
+
+# VLCode inclusions
+.settings.json
+
+# ssm - vscode specific folders
+.vscode
+
+# ignore builds from build script
+artifacts/
