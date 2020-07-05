@@ -12,6 +12,12 @@ devenv:
 builddevenv:
 	docker build -f Dockerfile.devenv -t $(DOCKERIMG) .
 
+
+.PHONY: pushdevenv
+pushdevenv:
+	docker $(DOCKERIMG)
+
+
 # scrach environment to experiment with buildenv
 .PHONY: scratchenv
 scratchenv:
