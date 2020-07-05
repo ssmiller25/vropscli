@@ -1,0 +1,93 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+      accept:
+      - application/json;charset=UTF-8
+      authorization:
+      - vRealizeOpsToken 0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f::0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f
+      content-type:
+      - application/json;charset=UTF-8
+    method: GET
+    uri: https://demo-trouble.bluemedora.com/suite-api/api/solutions
+  response:
+    body:
+      string: '{"solution":[{"id":"MPforvRBC","name":"VMware vRealize Business for
+        Cloud","version":"6.0.7962514","description":"Management Pack for VMware vRealize
+        Business for Cloud which defines the Launch-in-context rules for vSphere objects.","vendor":"VMware
+        Inc.","adapterKindKeys":["vRBCAdapter"]},{"id":"CiscoNetworking","name":"Cisco
+        Networking","version":"2.2.0.20180423.200938","description":"Monitors Cisco
+        Networking Switches remotely.","vendor":"Blue Medora","adapterKindKeys":["CiscoNetworkingAdapter"]},{"id":"AppOSUCPAdapter","name":"VMware
+        vRealize Application Management Pack","version":"1.0.8183626","description":"Enables
+        discovery and management of applications through VMware Application Proxy.","vendor":"VMware
+        Inc.","adapterKindKeys":["APPOSUCP"]},{"id":"MicrosoftSQLServer","name":"Microsoft
+        SQL Server","version":"2.3.0.20180420.134020","description":"Blue Medora Data
+        Provider that Monitors Microsoft SQL Server instances remotely","vendor":"Blue
+        Medora","adapterKindKeys":["SqlServerAdapter"]},{"id":"MPforvRealizeAutomation","name":"VMware
+        vRealize Automation","version":"4.0.8183624","description":"Manages vRealize
+        Automation objects such as Tenants, Reservations...","vendor":"VMware Inc.","adapterKindKeys":["vCACAdapter"]},{"id":"ep-ops-os-and-availability","name":"Operating
+        Systems / Remote Service Monitoring","version":"1.0.7899504","description":"The
+        End Point Operations Management Solution for Operating Systems / Remote Service
+        Monitoring provides insight into what is happening in your OS. It provides
+        key metrics for the OS, the processes, services, disk and network. It also
+        provides a solution to monitor availability of, and connectivity to, platforms
+        and services such as VMs, Web servers and other applications with network
+        listeners.","vendor":"VMware Inc.","adapterKindKeys":["ep-ops-os-and-availability-kind"]},{"id":"Management
+        Pack for Storage Area Network","name":"VMware vSAN","version":"2.0.0.8183627","description":"Manages
+        and Discovers vSAN Devices","vendor":"VMware Inc.","adapterKindKeys":["VirtualAndPhysicalSANAdapter"]},{"id":"DellEMCCompute","name":"Dell
+        EMC Compute","version":"1.0.0.20180725.160633","description":"Remotely monitors
+        Dell EMC Compute.","vendor":"Blue Medora","adapterKindKeys":["DELL_EMC_COMPUTE_ADAPTER"]},{"id":"OracleDatabase","name":"Oracle
+        Database","version":"1.2.0.20180727.122923","description":"Monitors Oracle
+        Databases remotely.","vendor":"Blue Medora","adapterKindKeys":["OracleDBAdapter"]},{"id":"MicrosoftIIS","name":"Microsoft
+        IIS","version":"1.0.0.20180514.205943","description":"Remotely monitors Microsoft
+        IIS.","vendor":"Blue Medora","adapterKindKeys":["MICROSOFTIIS_ADAPTER"]},{"id":"VOA
+        Reports","name":"VMware vRealize Assessments","version":"6.0.8183630","description":"Management
+        Pack for VMware vRealize Assessments","vendor":"VMware Inc.","adapterKindKeys":["VOAAdapter"]},{"id":"VMware
+        vSphere","name":"VMware vSphere","version":"6.0.8183622","description":"Manages
+        vSphere objects such as Clusters, Hosts...","vendor":"VMware Inc.","adapterKindKeys":["VMWARE","PythonRemediationVcenterAdapter"]},{"id":"MPforLogInsight","name":"VMware
+        vRealize Log Insight","version":"6.0.8183621","description":"Management Pack
+        for VMware vRealize Log Insight which defines the Launch-in-context rules
+        for vSphere objects.","vendor":"VMware Inc.","adapterKindKeys":["LogInsightAdapter"]},{"id":"PureStorageFlashArray","name":"Pure
+        Storage FlashArray","version":"1.0.0.20180511.183129","description":"Remotely
+        monitors Pure Storage FlashArray.","vendor":"Blue Medora","adapterKindKeys":["PURESTORAGEFLASHARRAY_ADAPTER"]}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Security-Policy:
+      - 'default-src https: data: ''unsafe-inline'' ''unsafe-eval''; child-src *'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Sun, 05 Jul 2020 12:49:27 GMT
+      Expires:
+      - '0'
+      Pragma:
+      - no-cache
+      Server:
+      - nginx/1.14.0 (Ubuntu)
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 5NsXMrNDlUD9OG7kuPTLKz5sa8FHO3mO
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: '200'
+version: 1

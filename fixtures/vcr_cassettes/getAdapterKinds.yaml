@@ -1,0 +1,93 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+      accept:
+      - application/json
+      authorization:
+      - vRealizeOpsToken 0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f::0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f
+    method: GET
+    uri: https://demo-trouble.bluemedora.com/suite-api/api/adapterkinds
+  response:
+    body:
+      string: '{"adapter-kind":[{"key":"CiscoNetworkingAdapter","name":"Cisco Networking","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["cisco_networking_adapter_instance","cisco_networking_hsrp_group","cisco_networking_hsrp_group_member","cisco_networking_l3_interface","cisco_networking_port","cisco_networking_port_relatives_tag","cisco_networking_switch","cisco_networking_switch_relatives_tag","cisco_networking_tag","cisco_networking_vsan","true_visibility_licensing"],"links":[{"href":"/suite-api/api/adapterkinds/CiscoNetworkingAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/CiscoNetworkingAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"Container","name":"Container","adapterKindType":"GENERAL","describeVersion":34,"identifiers":[],"resourceKinds":["BusinessService","ContainerAdapterInstance","Department","Enterprise","Environment","AIM
+        Plugin","Function","GeoTag","Licensing","Location","Security Zone","Service
+        Level Objective","Tier","Universe","vC-Ops-Self-Monitoring"],"links":[{"href":"/suite-api/api/adapterkinds/Container","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/Container/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"DELL_EMC_COMPUTE_ADAPTER","name":"Dell
+        EMC Compute","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["dell_emc_compute_bm_exuno_dellcompute_amperage_probe","dell_emc_compute_bm_exuno_dellcompute_blade_server","dell_emc_compute_bm_exuno_dellcompute_chassis","dell_emc_compute_bm_exuno_dellcompute_chassis_power_supply","dell_emc_cluster","dell_emc_compute_adapter_instance","dell_emc_compute_bm_exuno_dellcompute_cooling_device","dell_emc_compute_bm_exuno_dellcompute_intrusion_probe","dell_emc_compute_bm_exuno_dellcompute_memory_device","dell_emc_compute_bm_exuno_dellcompute_physical_disk","dell_emc_compute_bm_exuno_dellcompute_power_unit","dell_emc_poweredge_tag","dell_emc_compute_bm_exuno_dellcompute_processor_device","dell_emc_compute_bm_exuno_dellcompute_rack_power_supply","dell_emc_compute_bm_exuno_dellcompute_rack_server","dell_emc_compute_bm_exuno_dellcompute_system_battery","dell_emc_compute_bm_exuno_dellcompute_temperature_probe","dell_emc_compute_bm_exuno_dellcompute_virtual_disk","dell_emc_compute_bm_exuno_dellcompute_voltage_probe","true_visibility_licensing","dell_emc_vmware_host_systems_on_dell_poweredge_tag"],"links":[{"href":"/suite-api/api/adapterkinds/DELL_EMC_COMPUTE_ADAPTER","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/DELL_EMC_COMPUTE_ADAPTER/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"EP
+        Ops Adapter","name":"EP Ops Adapter","description":"EP Ops Adapter","adapterKindType":"GENERAL","describeVersion":4002,"identifiers":[],"resourceKinds":["AIX","EP
+        Ops Adapter Instance","EP Ops Adapter Resources Group","EP Ops Agent","HPUX","HTTP
+        Check","ICMP Check","Linux","MultiProcess","Operating Systems World","Remote
+        Checks World","Script","Solaris","TCP Check","Windows","Windows Service"],"links":[{"href":"/suite-api/api/adapterkinds/EP%20Ops%20Adapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/EP%20Ops%20Adapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"Http
+        Post","name":"Http Post","adapterKindType":"OPENAPI","describeVersion":1,"identifiers":[],"resourceKinds":["Http
+        Post Adapter Instance"],"links":[{"href":"/suite-api/api/adapterkinds/Http%20Post","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/Http%20Post/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"MICROSOFTIIS_ADAPTER","name":"Microsoft
+        IIS","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["microsoftiis_adapter_instance","microsoft_iis_microsoft_internetinformationservices_application","microsoft_iis_microsoft_internetinformationservices_application_pool","microsoft_iis_microsoft_internetinformationservices_virtual_directory","microsoft_iis_microsoft_internetinformationservices_web_server","microsoft_iis_microsoft_internetinformationservices_website","microsoft_iis_microsoft_internetinformationservices_worker_process","true_visibility_licensing"],"links":[{"href":"/suite-api/api/adapterkinds/MICROSOFTIIS_ADAPTER","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/MICROSOFTIIS_ADAPTER/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"SqlServerAdapter","name":"Microsoft
+        SQL Server","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["sql_server_traversal_tag","SqlServerAdapterInstance","SqlAvailabilityGroup","SqlDatabase","SqlServer","SqlQuery","SqlServerTag","microsoft_sql_server_wait_time","true_visibility_licensing"],"links":[{"href":"/suite-api/api/adapterkinds/SqlServerAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/SqlServerAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"OPENAPI","name":"OPENAPI","description":"OPENAPI","adapterKindType":"OPENAPI","describeVersion":1,"identifiers":[],"resourceKinds":["OPENAPI
+        Adapter Instance"],"links":[{"href":"/suite-api/api/adapterkinds/OPENAPI","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/OPENAPI/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"OracleDBAdapter","name":"Oracle
+        DB Adapter","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["OracleDBAdapterInstance","database","oracledb_environment_tag","instance","query","tablespace","true_visibility_licensing"],"links":[{"href":"/suite-api/api/adapterkinds/OracleDBAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/OracleDBAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"PURESTORAGEFLASHARRAY_ADAPTER","name":"Pure
+        Storage FlashArray","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["pure_storage_flasharray_purestorage_flasharray_array","pure_storage_flasharray_purestorage_flasharray_host","pure_storage_flasharray_purestorage_flasharray_host_group","pure_storage_flasharray_host_groups_tag","pure_storage_flasharray_hosts_tag","pure_storage_flasharray_purestorage_flasharray_protection_group","pure_storage_flasharray_protection_groups_tag","purestorageflasharray_adapter_instance","pure_storage_flasharray_tag","pure_storage_flasharray_purestorage_flasharray_volume","pure_storage_flasharray_purestorage_flasharray_volume_group","pure_storage_flasharray_volume_groups_tag","pure_storage_flasharray_volumes_tag","true_visibility_licensing"],"links":[{"href":"/suite-api/api/adapterkinds/PURESTORAGEFLASHARRAY_ADAPTER","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/PURESTORAGEFLASHARRAY_ADAPTER/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"VMWARE","name":"vCenter
+        Adapter","description":"Provides the connection information and credentials
+        required to monitor your vCenter Server instances","adapterKindType":"GENERAL","describeVersion":690,"identifiers":[],"resourceKinds":["ClusterComputeResource","ComputeResource","CustomDatacenter","Datacenter","Datastore","StoragePod","DatastoreFolder","VM
+        Entity Status","Folder","HostFolder","HostSystem","NetworkFolder","ResourcePool","VMwareAdapter
+        Instance","VirtualMachine","VMFolder","DistributedVirtualPortgroup","VmwareDistributedVirtualSwitch","vSphere
+        World"],"links":[{"href":"/suite-api/api/adapterkinds/VMWARE","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/VMWARE/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"PythonRemediationVcenterAdapter","name":"vCenter
+        Python Actions Adapter","description":"Provides actions for vCenter objects
+        using Python scripts","adapterKindType":"GENERAL","describeVersion":128,"identifiers":[],"resourceKinds":["PythonRemediationVcenterAdapter
+        Instance"],"links":[{"href":"/suite-api/api/adapterkinds/PythonRemediationVcenterAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/PythonRemediationVcenterAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"APPOSUCP","name":"VMware
+        vRealize Application Management Pack","adapterKindType":"GENERAL","describeVersion":12,"identifiers":[],"resourceKinds":["Apache
+        HTTPD","UCPSERVER","Apache Cassandra","Elasticsearch","Mongo DB","MS-SQL DB","MySQL
+        DB","Nginx","OS","Services","PostgreSQL DB","RabbitMQ","ServiceType","Telegraf
+        Service","APPOSUCPAdapterInstance","Apache ZooKeeper"],"links":[{"href":"/suite-api/api/adapterkinds/APPOSUCP","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/APPOSUCP/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"VOAAdapter","name":"VOAAdapter","description":"VOAAdapter","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["VOAAdapterInstance"],"links":[{"href":"/suite-api/api/adapterkinds/VOAAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/VOAAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"vRBCAdapter","name":"vRBC
+        Adapter","adapterKindType":"GENERAL","describeVersion":1,"identifiers":[],"resourceKinds":["vRBC
+        Adapter Instance"],"links":[{"href":"/suite-api/api/adapterkinds/vRBCAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/vRBCAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"VCACAdapter","name":"vRealize
+        Automation Adapter","adapterKindType":"GENERAL","describeVersion":30,"identifiers":[],"resourceKinds":["BLUEPRINT","BUSINESSGROUP","DEPLOYMENT","FABRICGROUP","NETWORKPROFILE","RESERVATION","RESERVATIONPOLICY","STORAGERESERVATIONPOLICY","TENANT","ENTITYSTATUS","VCACAdapter
+        Instance","vRA World"],"links":[{"href":"/suite-api/api/adapterkinds/VCACAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/VCACAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"LogInsightAdapter","name":"vRealize
+        Log Insight Adapter","adapterKindType":"GENERAL","describeVersion":14,"identifiers":[],"resourceKinds":["LoginSight
+        Adapter Instance"],"links":[{"href":"/suite-api/api/adapterkinds/LogInsightAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/LogInsightAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"vCenter
+        Operations Adapter","name":"vRealize Operations Adapter","description":"vRealize
+        Operations Manager Adapter","adapterKindType":"GENERAL","describeVersion":282,"identifiers":[],"resourceKinds":["vCenter
+        Operations Adapter Instance","vC-Ops-Admin-UI","vC-Ops-Analytics","vC-Ops-CaSA","vC-Ops-Cluster","vC-Ops-Collector","vC-Ops-Controller","vC-Ops-Fsdb","vC-Ops-ManagementPack","vC-Ops-ManagementPackGroup","vC-Ops-Node","vC-Ops-Persistence","vC-Ops-Product-UI","vC-Ops-Remote-Collector","vC-Ops-Suite-API","vC-Ops-Watchdog"],"links":[{"href":"/suite-api/api/adapterkinds/vCenter%20Operations%20Adapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/vCenter%20Operations%20Adapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"vRealizeOpsMgrAPI","name":"vRealizeOpsMgrAPI","description":"vRealizeOpsMgrAPI","adapterKindType":"OPENAPI","describeVersion":1,"identifiers":[],"resourceKinds":["vRealizeOpsMgrAPI
+        Adapter Instance"],"links":[{"href":"/suite-api/api/adapterkinds/vRealizeOpsMgrAPI","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/vRealizeOpsMgrAPI/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]},{"key":"VirtualAndPhysicalSANAdapter","name":"vSAN
+        Adapter","description":"vSAN Adapter","adapterKindType":"GENERAL","describeVersion":9,"identifiers":[],"resourceKinds":["CacheDisk","CapacityDisk","NonVirtualSANDatastore","VirtualAndPhysicalSANAdapter
+        Instance","VirtualSANDCCluster","VirtualSANCluster","VirtualSANDatastore","VirtualSANDiskGroup","VirtualSANFaultDomain","VirtualSANHost","VirtualSANWitnessHost","vSAN
+        World"],"links":[{"href":"/suite-api/api/adapterkinds/VirtualAndPhysicalSANAdapter","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/adapterkinds/VirtualAndPhysicalSANAdapter/resourcekinds","rel":"RELATED","name":"linkToAllResourceKinds"}]}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Security-Policy:
+      - 'default-src https: data: ''unsafe-inline'' ''unsafe-eval''; child-src *'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Sun, 05 Jul 2020 12:56:00 GMT
+      Expires:
+      - '0'
+      Pragma:
+      - no-cache
+      Server:
+      - nginx/1.14.0 (Ubuntu)
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - hJXCFLXk5QZeRMQsSjj15eE9KLblMUwT
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: '200'
+version: 1

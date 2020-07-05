@@ -1,0 +1,56 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+      accept:
+      - application/json;charset=UTF-8
+      authorization:
+      - vRealizeOpsToken 0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f::0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f
+      content-type:
+      - application/json;charset=UTF-8
+    method: GET
+    uri: https://demo-trouble.bluemedora.com/suite-api/api/collectors
+  response:
+    body:
+      string: '{"collector":[{"name":"vRealize Operations Manager Collector-vr67-trouble","state":"UP","hostName":"172.20.0.2","local":true,"lastHeartbeat":1534514570724,"adapterInstanceIds":["0e310ec0-f62e-43d4-adef-8546f8153583","193f2f4d-02c1-4450-b64e-895fe832e480","1dc87541-1e36-4d1f-828d-8c2627122083","1fa1b49a-31c3-481e-a802-e6c02fb3cf00","282d22f2-c69e-4ac5-9674-636ddc46bf2e","28ebcc0e-a372-4d9b-b824-0b2dac59aa7e","2ab9a813-c6bd-446a-8550-cee1310f347f","39c9e609-8fd6-492d-9e6a-8ddf3e70cdc2","41e1aad3-f025-4ee8-a598-3685d08397e6","59f27652-7960-427f-ad0c-2150b9eec67e","6949348c-18ff-4084-aa37-8330a9e0168e","81e30815-d98a-4159-9f8d-c48e819bc1eb","93fab12e-01b1-460a-968e-e172dbd5731c","96a582e0-ccdd-4f52-908b-0f247d2ba80d","9bd77a07-efa8-4531-8da4-7d1806f8db14","a0ca89a0-a955-49f2-8f83-ec41f7ffa513","a3c23232-7b0d-4a58-b83b-486a392e35f4","c14a7fd4-f16b-4388-b486-f6bde743a6c8","c3d704a1-b134-407f-9e1c-ab852aa7fcd2"],"links":[{"href":"/suite-api/api/adapters/0e310ec0-f62e-43d4-adef-8546f8153583","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/193f2f4d-02c1-4450-b64e-895fe832e480","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/1dc87541-1e36-4d1f-828d-8c2627122083","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/1fa1b49a-31c3-481e-a802-e6c02fb3cf00","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/282d22f2-c69e-4ac5-9674-636ddc46bf2e","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/28ebcc0e-a372-4d9b-b824-0b2dac59aa7e","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/2ab9a813-c6bd-446a-8550-cee1310f347f","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/39c9e609-8fd6-492d-9e6a-8ddf3e70cdc2","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/41e1aad3-f025-4ee8-a598-3685d08397e6","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/59f27652-7960-427f-ad0c-2150b9eec67e","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/6949348c-18ff-4084-aa37-8330a9e0168e","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/81e30815-d98a-4159-9f8d-c48e819bc1eb","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/93fab12e-01b1-460a-968e-e172dbd5731c","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/96a582e0-ccdd-4f52-908b-0f247d2ba80d","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/9bd77a07-efa8-4531-8da4-7d1806f8db14","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/a0ca89a0-a955-49f2-8f83-ec41f7ffa513","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/a3c23232-7b0d-4a58-b83b-486a392e35f4","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/c14a7fd4-f16b-4388-b486-f6bde743a6c8","rel":"RELATED","name":"linksToAdapters"},{"href":"/suite-api/api/adapters/c3d704a1-b134-407f-9e1c-ab852aa7fcd2","rel":"RELATED","name":"linksToAdapters"}],"id":"1","uuId":"f6f56902-4395-4e4c-89fe-44494919c566","nodeIdentifier":"00f6cec0-35be-4b3e-870d-5beb66f3c209"}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Security-Policy:
+      - 'default-src https: data: ''unsafe-inline'' ''unsafe-eval''; child-src *'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Sun, 05 Jul 2020 13:09:38 GMT
+      Expires:
+      - '0'
+      Pragma:
+      - no-cache
+      Server:
+      - nginx/1.14.0 (Ubuntu)
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - RdWJrcsDKpZByL1FZPQt9oc5P6AtL1bw
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: '200'
+version: 1

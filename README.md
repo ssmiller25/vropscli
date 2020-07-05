@@ -22,6 +22,7 @@ endpoint configuration, credential management, and more!  The design is focused 
 ```
 
 * Run `pipenv --python 3.7` In current directory (or `pipenv --python 3.6 for vROps build directly`)
+  * If a local python is not available, you may need to [install pyenv](https://github.com/pyenv/pyenv-installer)
 * Run `pipenv lock --pre` and `pipenv sync` to ensure everything is up to date
 
 ### To Use

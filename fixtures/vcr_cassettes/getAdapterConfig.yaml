@@ -1,0 +1,56 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+      accept:
+      - application/json;charset=UTF-8
+      authorization:
+      - vRealizeOpsToken 0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f::0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f
+      content-type:
+      - application/json;charset=UTF-8
+    method: GET
+    uri: https://demo-trouble.bluemedora.com/suite-api/api/adapters/?adapterKindKey=CiscoNetworkingAdapter
+  response:
+    body:
+      string: '{"adapterInstancesInfoDto":[{"resourceKey":{"name":"sw-2960-48-uss-s1","adapterKindKey":"CiscoNetworkingAdapter","resourceKindKey":"cisco_networking_adapter_instance","resourceIdentifiers":[{"identifierType":{"name":"create_vm_relationships","dataType":"STRING","isPartOfUniqueness":false},"value":"True"},{"identifierType":{"name":"discoverPorts","dataType":"STRING","isPartOfUniqueness":false},"value":"True"},{"identifierType":{"name":"host","dataType":"STRING","isPartOfUniqueness":true},"value":"sw-2960-48-uss-s1"},{"identifierType":{"name":"max_suite_api_calls","dataType":"STRING","isPartOfUniqueness":false},"value":"200"},{"identifierType":{"name":"max_threads","dataType":"STRING","isPartOfUniqueness":false},"value":"10"},{"identifierType":{"name":"port","dataType":"STRING","isPartOfUniqueness":false},"value":"161"},{"identifierType":{"name":"protocol","dataType":"STRING","isPartOfUniqueness":false},"value":"https"},{"identifierType":{"name":"retries","dataType":"STRING","isPartOfUniqueness":false},"value":"2"},{"identifierType":{"name":"support_autodiscovery","dataType":"STRING","isPartOfUniqueness":false},"value":"True"},{"identifierType":{"name":"timeout_interval","dataType":"STRING","isPartOfUniqueness":false},"value":"20"},{"identifierType":{"name":"validate_certificate_against_truststore","dataType":"STRING","isPartOfUniqueness":false},"value":"False"}]},"description":"","collectorId":1,"collectorGroupId":"404cfbae-3238-4f1e-bc2f-56a012d8338b","credentialInstanceId":"e2789fbd-4642-4689-af10-9c57f61e8eb5","monitoringInterval":5,"numberOfMetricsCollected":1693,"numberOfResourcesCollected":134,"lastHeartbeat":1534514450716,"lastCollected":1534514378282,"messageFromAdapterInstance":"","links":[{"href":"/suite-api/api/adapters/41e1aad3-f025-4ee8-a598-3685d08397e6","rel":"SELF","name":"linkToSelf"},{"href":"/suite-api/api/credentials/e2789fbd-4642-4689-af10-9c57f61e8eb5","rel":"RELATED","name":"linkToCredential"}],"id":"41e1aad3-f025-4ee8-a598-3685d08397e6"}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Security-Policy:
+      - 'default-src https: data: ''unsafe-inline'' ''unsafe-eval''; child-src *'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Sun, 05 Jul 2020 13:07:25 GMT
+      Expires:
+      - '0'
+      Pragma:
+      - no-cache
+      Server:
+      - nginx/1.14.0 (Ubuntu)
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - TdUGIQNj5qIQyR4jxdnOZCk7j1cpigdq
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: '200'
+version: 1
