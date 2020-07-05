@@ -1,5 +1,5 @@
 FROM python:3.7
-RUN pip install pipenv
+RUN pip install pipenv pylint
 
 WORKDIR /root
 COPY Pipfile /root/Pipfile
@@ -10,9 +10,3 @@ RUN pipenv lock -r | tee -a /root/requirements.txt && \
   pip install -r /root/requirements.txt
 
 WORKDIR /vropscli
-
-# Old stuff below
-#RUN pipenv --python 3.7 && pipenv lock --pre && pipenv sync 
-#RUN pipenv install 
-## Try to export to requirements.txt, then import those? 
-#RUN pipenv lock -r | tee -a /root/requirements.txt
