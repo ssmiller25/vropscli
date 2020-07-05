@@ -24,6 +24,7 @@
 ### Checklist:
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
 - [ ] My code passes lint test with `pylint` (see README.md for parameters to use) 
+- [ ] My code passes test with `pytest`
 - [ ] I have updated the documentation.
 - [ ] I have added / updated tests to cover my changes.
 - [ ] All new and existing tests passed within the Jenkinsfile
