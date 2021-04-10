@@ -22,11 +22,23 @@ endpoint configuration, credential management, and more!  The design is focused 
 ```
 
 * Run `pipenv --python 3.7` In current directory (or `pipenv --python 3.6 for vROps build directly`)
+  * If a local python is not available, you may need to [install pyenv](https://github.com/pyenv/pyenv-installer)
 * Run `pipenv lock --pre` and `pipenv sync` to ensure everything is up to date
+
 
 ### To Use
 
 * Run `pipenv shell` to enter environment
+
+
+### Development Environment Alternative - Docker
+
+* Use docker to run and test code.  Run the following to start a dockerfile setup with pre-requisites install, and with the source 
+mapped to /vropscli.  Authentication information for the hosts .vropscli.yml will also be mapped in.
+
+```sh
+make devenv 
+```
 
 ### To Distribute
 
@@ -37,6 +49,18 @@ Make sure to compile this on the *oldest* OS you wish to support with your binar
 
 ```sh
 pylint --disable=all --enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode *.py
+```
+
+* Run pytest suite
+
+```sh
+pytest
+```
+
+* Make sure authentication tokens are cleared from recorded sessions.
+
+```sh
+make cleanauth
 ```
 
 * Run installer locally
